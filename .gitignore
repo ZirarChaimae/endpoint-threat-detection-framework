@@ -1,0 +1,18 @@
+# --- VM files (if you ever store them near the repo) ---
+
+*.vmdk
+*.vmx
+*.vmxf
+*.nvram
+*.vmsd
+*.log
+
+# --- Raw log exports ---
+*.evtx
+
+# --- OS junk files ---
+.DS_Store
+Thumbs.db
+
+# --- VS Code personal settings (optional) ---
+.vscode/
