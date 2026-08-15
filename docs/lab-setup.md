@@ -21,3 +21,8 @@
 - Install command: .\Sysmon64.exe -accepteula -i sysmonconfig.xml
 - Verified running: Get-Service Sysmon64 → Status Running
 - Verified logging: Get-WinEvent confirmed Event ID 1 entries present
+
+## Log Export Process
+- Sysmon log exported via: wevtutil epl Microsoft-Windows-Sysmon/Operational C:\logs\sysmon_export.evtx
+- Security log exported via: wevtutil epl Security C:\logs\security_export.evtx
+- Exports transferred host-side via VMware shared folder, stored locally in logs-samples/ (not committed — see .gitignore)
