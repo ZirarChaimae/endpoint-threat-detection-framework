@@ -1,0 +1,22 @@
+title: Outbound Network Connection Probe (Remote System Discovery)
+id: 8f9a0b1c-2d3e-4456-8c7d-8e9f0a1b2c3d
+status: experimental
+description: Detects a process establishing an outbound network connection, consistent with reconnaissance/probing of other hosts on the network.
+author: Zirar Chaimae
+date: 2026/08/17
+references:
+    - https://attack.mitre.org/techniques/T1018/
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        Initiated: 'true'
+        DestinationIsIpv6: 'false'
+    condition: selection
+falsepositives:
+    - Extremely broad — nearly all normal network activity matches this pattern. In a real deployment this would need to be narrowed by destination port, process, or paired with other signals.
+level: low
+tags:
+    - attack.discovery
+    - attack.t1018

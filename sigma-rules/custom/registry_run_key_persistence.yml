@@ -1,0 +1,22 @@
+title: Registry Run Key Persistence via reg.exe
+id: 5a1b8e94-2f6c-4d17-8e9a-3c7f1d0b4a56
+status: experimental
+description: Detects use of reg.exe to add a value under the Run key, a common technique for surviving reboot/persisting on a system.
+author: Zirar Chaimae
+date: 2026/08/19
+references:
+    - https://attack.mitre.org/techniques/T1547/001/
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\reg.exe'
+        CommandLine|contains: 'CurrentVersion\Run'
+    condition: selection
+falsepositives:
+    - Legitimate software installers registering startup entries via reg.exe
+level: medium
+tags:
+    - attack.persistence
+    - attack.t1547.001

@@ -1,0 +1,20 @@
+title: DNS Query Logged (Demonstration of DNS Telemetry)
+id: 9a0b1c2d-3e4f-4567-9d8e-9f0a1b2c3d4e
+status: experimental
+description: Demonstrates DNS query logging via Sysmon Event ID 22. Used here as a simplified stand-in to show DNS-based telemetry collection, not as a real C2/exfiltration detection.
+author: Zirar Chaimae
+date: 2026/08/17
+references:
+    - https://attack.mitre.org/techniques/T1071/004/
+logsource:
+    category: dns_query
+    product: windows
+detection:
+    selection:
+        QueryName|contains: 'example.com'
+    condition: selection
+falsepositives:
+    - This specific rule only matches one domain, so it is intentionally not a real detection — a production rule would instead flag rare/newly-seen/algorithmically-generated domain patterns.
+level: informational
+tags:
+    - attack.t1071.004

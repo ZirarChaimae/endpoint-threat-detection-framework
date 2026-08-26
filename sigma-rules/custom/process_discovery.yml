@@ -1,0 +1,21 @@
+title: Process Discovery via tasklist.exe
+id: 5c6d7e8f-9a0b-4123-9f4a-5b6c7d8e9f0a
+status: experimental
+description: Detects execution of tasklist.exe, often used to enumerate running processes and identify security tools.
+author: Zirar Chaimae
+date: 2026/08/19
+references:
+    - https://attack.mitre.org/techniques/T1057/
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\tasklist.exe'
+    condition: selection
+falsepositives:
+    - IT troubleshooting, monitoring scripts
+level: informational
+tags:
+    - attack.discovery
+    - attack.t1057

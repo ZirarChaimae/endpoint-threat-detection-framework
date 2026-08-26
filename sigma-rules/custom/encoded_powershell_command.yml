@@ -1,0 +1,21 @@
+title: Suspicious Encoded PowerShell Command
+id: 7e8f9a0b-1c2d-4345-9b6c-7d8e9f0a1b2c
+status: experimental
+description: Detects PowerShell execution with an encoded command argument, used to obfuscate payloads from casual inspection and simple string matching.
+author: Zirar Chaimae
+date: 2026/08/17
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains: '-EncodedCommand'
+    condition: selection
+falsepositives:
+    - Legitimate admin automation scripts using encoded commands for special-character safety
+level: high
+tags:
+    - attack.t1059.001

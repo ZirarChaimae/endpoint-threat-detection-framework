@@ -1,0 +1,21 @@
+title: System Information Discovery via systeminfo.exe
+id: 1e2d3c4b-5a6f-4789-9b0c-1d2e3f4a5b6c
+status: experimental
+description: Detects execution of systeminfo.exe, commonly used by attackers post-compromise to fingerprint the host.
+author: Zirar Chaimae
+date: 2026/08/17
+references:
+    - https://attack.mitre.org/techniques/T1082/
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\systeminfo.exe'
+    condition: selection
+falsepositives:
+    - IT support or automated asset-inventory scripts
+level: low
+tags:
+    - attack.discovery
+    - attack.t1082
