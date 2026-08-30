@@ -34,6 +34,8 @@ Write-Host "[5/6] Running Chainsaw against custom rules (Sysmon log)..."
 
 Write-Host "[6/6] Running Chainsaw against custom + adopted rules (Security log)..."
 & $chainsaw hunt "$repo\logs-samples\security_$timestamp.evtx" --sigma "$repo\sigma-rules\custom" --mapping $mapping --csv --output "$repo\detections\chainsaw-output\security-custom-$timestamp"
+Write-Host "[+] Running Chainsaw against community rule set (this may take longer)..."
+& $chainsaw hunt "$repo\logs-samples\sysmon_$timestamp.evtx" --sigma "$repo\sigma-rules\community" --mapping $mapping --csv --output "$repo\detections\chainsaw-output\sysmon-community-$timestamp"
 & $chainsaw hunt "$repo\logs-samples\security_$timestamp.evtx" --sigma "$repo\sigma-rules\adopted" --mapping $mapping --csv --output "$repo\detections\chainsaw-output\security-adopted-$timestamp"
 
 Write-Host ""
