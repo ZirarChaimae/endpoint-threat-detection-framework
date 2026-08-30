@@ -20,3 +20,11 @@ Simulating T1070.001 (clear Windows event logs via `wevtutil cl Security`) perma
   (sysmon-<timestamp>, security-custom-<timestamp>, security-adopted-<timestamp>)
 - Credentials passed as a runtime parameter, never hardcoded or committed
 - Resolved PowerShell execution policy restriction via Set-ExecutionPolicy -Scope CurrentUser
+
+## Finding: SigmaHQ adopted rule too narrow for manual bad-password tests
+The adopted rule (win_security_susp_failed_logon_reasons.yml) targets uncommon failure codes
+(disabled accounts, unauthorized workstations, outside-hours logons) and did not match manual
+bad-password attempts, which produce Status 0xC000006D — a code not covered by that rule.
+Wrote a new custom rule (failed_logon_bad_password.yml) specifically for this common case.
+Kept the adopted rule in the project as a demonstration of a different, more targeted detection
+pattern used by real SOC teams for account-tampering scenarios.
