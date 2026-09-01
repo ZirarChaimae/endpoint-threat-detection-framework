@@ -1,0 +1,36 @@
+{
+  "patterns": [
+    {
+      "id": "phishing-to-persistence",
+      "name": "Phishing/PowerShell to Registry Persistence",
+      "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+      "time_window_minutes": 10,
+      "stages": [
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001" },
+        { "match_contains": "Registry Run Key", "mitre": "T1547.001" }
+      ]
+    },
+    {
+      "id": "execution-to-lateral-movement",
+      "name": "Execution to Credential Access to Discovery to Lateral Movement",
+      "description": "A staged intrusion progressing from code execution through credential access, host/network discovery, and an attempt at lateral movement.",
+      "time_window_minutes": 15,
+      "stages": [
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001" },
+        { "match_contains": "Failed Logon", "mitre": "T1110" },
+        { "match_contains": "Discovery", "mitre": "T1082" },
+        { "match_contains": "Remote System Discovery", "mitre": "T1018" }
+      ]
+    },
+    {
+      "id": "compromise-to-staging",
+      "name": "Compromise to Scheduled Task to Command Execution to Data Staging",
+      "description": "Persistence established via scheduled task, followed by command execution and preparation of data for exfiltration.",
+      "time_window_minutes": 15,
+      "stages": [
+        { "match_contains": "Scheduled Task", "mitre": "T1053.005" },
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001" }
+      ]
+    }
+  ]
+}
