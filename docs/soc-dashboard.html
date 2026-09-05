@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Endpoint Detection — SOC Console</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
+  h1 { color: #58a6ff; margin-bottom: 5px; }
+  .subtitle { color: #8b949e; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid #30363d; }
+  .tab { padding: 10px 20px; cursor: pointer; color: #8b949e; border-bottom: 2px solid transparent; }
+  .tab.active { color: #58a6ff; border-bottom: 2px solid #58a6ff; }
+  .tab:hover { color: #c9d1d9; }
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+  #filterInput { padding: 8px; width: 300px; background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px; }
+  button { padding: 8px 16px; background: #238636; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+  button:hover { background: #2ea043; }
+  button:disabled { background: #30363d; cursor: not-allowed; }
+  #status { color: #8b949e; margin-left: 10px; }
+  #count { color: #8b949e; margin: 10px 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 10px; text-align: left; border-bottom: 1px solid #30363d; font-size: 14px; }
+  th { background: #161b22; color: #58a6ff; }
+  tr:hover { background: #161b22; }
+  .sev-high { border-left: 4px solid #f85149; }
+  .sev-medium { border-left: 4px solid #d29922; }
+  .sev-low { border-left: 4px solid #3fb950; }
+  .badge { padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+  .badge-high { background: #f85149; color: #fff; }
+  .badge-medium { background: #d29922; color: #000; }
+  .badge-low { background: #3fb950; color: #000; }
+  #vmBanner { display:none; background:#f85149; color:#fff; padding:10px 15px; border-radius:6px; margin-bottom:15px; font-weight:bold; }
+  #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
+  #modalBox { background: #161b22; padding: 20px; border-radius: 8px; width: 320px; }
+  #modalBox input { width: 100%; padding: 8px; margin: 10px 0; background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+  <h1>Endpoint Threat Detection — SOC Console</h1>
+  <div id="vmBanner">VM is not running — power it on before running a new hunt.</div>
+  <div class="subtitle" id="folderInfo">Loading latest detections...</div>
+
+  <div class="toolbar">
+    <button id="refreshBtn">Refresh</button>
+    <button id="runHuntBtn">Run New Hunt</button>
+    <span id="status"></span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="sysmon">Sysmon</div>
+    <div class="tab" data-tab="security_custom">Security (Custom Rules)</div>
+    <div class="tab" data-tab="security_adopted">Security (Adopted Rules)</div>
+  </div>
+
+  <input type="text" id="filterInput" placeholder="Filter by rule name, technique, or process...">
+  <div id="count"></div>
+  <table>
+    <thead>
+      <tr><th>Timestamp</th><th>Detection</th><th>Event ID</th><th>Computer</th><th>Severity</th></tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+
+  <div id="modal">
+    <div id="modalBox">
+      <h3 style="margin-top:0; color:#58a6ff;">Run New Hunt</h3>
+      <p style="color:#8b949e; font-size:13px;">Enter the VM guest password to export logs and run Chainsaw.</p>
+      <input type="password" id="passwordInput" placeholder="VM guest password">
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="confirmRunBtn">Run</button>
+        <button id="cancelRunBtn" style="background:#30363d;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+window.onerror = function(message, source, lineno) {
+  document.getElementById('folderInfo').textContent = 'JS ERROR: ' + message + ' (line ' + lineno + ')';
+  document.getElementById('folderInfo').style.color = '#f85149';
+};
+
+let dataStore = { sysmon: [], security_custom: [], security_adopted: [] };
+let currentTab = 'sysmon';
+
+function guessSeverity(detectionName) {
+  const name = (detectionName || '').toLowerCase();
+  if (name.includes('cleared') || name.includes('encoded') || name.includes('registry run key')) return 'high';
+  if (name.includes('scheduled task') || name.includes('hidden') || name.includes('extensions')) return 'medium';
+  return 'low';
+}
+
+function renderTable() {
+  const rows = dataStore[currentTab] || [];
+  const filterVal = document.getElementById('filterInput').value.toLowerCase();
+  const filtered = filterVal
+    ? rows.filter(r => JSON.stringify(r).toLowerCase().includes(filterVal))
+    : rows;
+
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = '';
+  document.getElementById('count').textContent = filtered.length + ' detection(s)';
+
+  filtered.forEach(r => {
+    const sev = guessSeverity(r.detections);
+    const tr = document.createElement('tr');
+    tr.className = 'sev-' + sev;
+    tr.innerHTML = '<td>' + (r.timestamp || '') + '</td>' +
+      '<td>' + (r.detections || '') + '</td>' +
+      '<td>' + (r['Event ID'] || '') + '</td>' +
+      '<td>' + (r.Computer || '') + '</td>' +
+      '<td><span class="badge badge-' + sev + '">' + sev.toUpperCase() + '</span></td>';
+    body.appendChild(tr);
+  });
+}
+
+async function loadLatest() {
+  document.getElementById('status').textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/latest');
+    const data = await res.json();
+    dataStore.sysmon = data.sysmon.rows;
+    dataStore.security_custom = data.security_custom.rows;
+    dataStore.security_adopted = data.security_adopted.rows;
+
+    document.getElementById('folderInfo').textContent =
+      'Sysmon: ' + (data.sysmon.folder || 'none') +
+      ' | Security (custom): ' + (data.security_custom.folder || 'none') +
+      ' | Security (adopted): ' + (data.security_adopted.folder || 'none');
+
+    renderTable();
+    document.getElementById('status').textContent = '';
+  } catch (err) {
+    document.getElementById('status').textContent = 'Error loading data: ' + err;
+  }
+}
+
+async function checkVmStatus() {
+  try {
+    const res = await fetch('/api/vm-status');
+    const data = await res.json();
+    const banner = document.getElementById('vmBanner');
+    banner.style.display = data.running ? 'none' : 'block';
+  } catch (err) {
+    console.error('VM status check failed:', err);
+  }
+}
+
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    currentTab = tab.dataset.tab;
+    renderTable();
+  });
+});
+
+document.getElementById('filterInput').addEventListener('input', renderTable);
+document.getElementById('refreshBtn').addEventListener('click', loadLatest);
+
+document.getElementById('runHuntBtn').addEventListener('click', function() {
+  document.getElementById('modal').style.display = 'flex';
+});
+document.getElementById('cancelRunBtn').addEventListener('click', function() {
+  document.getElementById('modal').style.display = 'none';
+});
+
+document.getElementById('confirmRunBtn').addEventListener('click', async function() {
+  const password = document.getElementById('passwordInput').value;
+  if (!password) return;
+  document.getElementById('modal').style.display = 'none';
+  document.getElementById('status').textContent = 'Running hunt... this takes ~30-60s';
+  document.getElementById('runHuntBtn').disabled = true;
+
+  try {
+    const res = await fetch('/api/run-hunt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password })
+    });
+    const result = await res.json();
+    document.getElementById('passwordInput').value = '';
+
+    if (result.success) {
+      document.getElementById('status').textContent = 'Hunt complete. Refreshing...';
+      await loadLatest();
+    } else {
+      document.getElementById('status').textContent = 'Hunt failed: ' + (result.error || result.stderr || 'unknown error');
+    }
+  } catch (err) {
+    document.getElementById('status').textContent = 'Request error: ' + err;
+  }
+  document.getElementById('runHuntBtn').disabled = false;
+});
+
+loadLatest();
+checkVmStatus();
+setInterval(checkVmStatus, 15000);
+</script>
+</body>
+</html>
