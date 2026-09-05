@@ -5,9 +5,11 @@
       "name": "Phishing/PowerShell to Registry Persistence",
       "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
       "time_window_minutes": 10,
+      "severity": "high",
+      "confidence": "high",
       "stages": [
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001" },
-        { "match_contains": "Registry Run Key", "mitre": "T1547.001" }
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
+        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
       ]
     },
     {
@@ -15,11 +17,13 @@
       "name": "Execution to Credential Access to Discovery to Lateral Movement",
       "description": "A staged intrusion progressing from code execution through credential access, host/network discovery, and an attempt at lateral movement.",
       "time_window_minutes": 15,
+      "severity": "high",
+      "confidence": "medium",
       "stages": [
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001" },
-        { "match_contains": "Failed Logon", "mitre": "T1110" },
-        { "match_contains": "Discovery", "mitre": "T1082" },
-        { "match_contains": "Remote System Discovery", "mitre": "T1018" }
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
+        { "match_contains": "Failed Logon", "mitre": "T1110", "tactic": "Credential Access" },
+        { "match_contains": "Discovery", "mitre": "T1082", "tactic": "Discovery" },
+        { "match_contains": "Remote System Discovery", "mitre": "T1018", "tactic": "Discovery" }
       ]
     },
     {
@@ -27,9 +31,11 @@
       "name": "Compromise to Scheduled Task to Command Execution to Data Staging",
       "description": "Persistence established via scheduled task, followed by command execution and preparation of data for exfiltration.",
       "time_window_minutes": 15,
+      "severity": "medium",
+      "confidence": "medium",
       "stages": [
-        { "match_contains": "Scheduled Task", "mitre": "T1053.005" },
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001" }
+        { "match_contains": "Scheduled Task", "mitre": "T1053.005", "tactic": "Persistence" },
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" }
       ]
     }
   ]

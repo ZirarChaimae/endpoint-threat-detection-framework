@@ -1,5 +1,6 @@
 import json
 import csv
+import re
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -37,6 +38,10 @@ def load_all_detections():
 def parse_timestamp(ts_string):
     # Chainsaw timestamps look like: 2026-08-16T16:21:54.824220+00:00
     return datetime.fromisoformat(ts_string.replace("Z", "+00:00"))
+
+def extract_user(event_data_text):
+    match = re.search(r"^User:\s*(.+)$", event_data_text or "", re.MULTILINE)
+    return match.group(1).strip() if match else "unknown"
 
 
 def match_patterns(rows, patterns):
@@ -81,6 +86,7 @@ def match_patterns(rows, patterns):
                     break
 
             if all_stages_found:
+                users = list(set(extract_user(e.get("Event Data", "")) for e in matched_events))
                 incidents.append({
                     "pattern_id": pattern["id"],
                     "pattern_name": pattern["name"],
@@ -88,13 +94,19 @@ def match_patterns(rows, patterns):
                     "start_time": start_ts.isoformat(),
                     "end_time": last_ts.isoformat(),
                     "computer": start_row.get("Computer", "unknown"),
+                    "users": users,
+                    "severity": pattern.get("severity", "medium"),
+                    "confidence": pattern.get("confidence", "medium"),
                     "stage_count": len(matched_events),
-                    "mitre_techniques": [s["mitre"] for s in stages],
+                    "mitre_techniques": [
+                        {"id": s["mitre"], "tactic": s.get("tactic", "")} for s in stages
+                    ],
                     "events": [
                         {
                             "timestamp": e.get("timestamp"),
                             "detection": e.get("detections"),
                             "event_id": e.get("Event ID"),
+                            "user": extract_user(e.get("Event Data", ""))
                         }
                         for e in matched_events
                     ]
