@@ -1,100 +1,361 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Endpoint Detection — SOC Console</title>
+<title>Endpoint Threat Detection — SOC Console</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
-  h1 { color: #58a6ff; margin-bottom: 5px; }
-  .subtitle { color: #8b949e; margin-bottom: 20px; }
-  .tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid #30363d; }
-  .tab { padding: 10px 20px; cursor: pointer; color: #8b949e; border-bottom: 2px solid transparent; }
-  .tab.active { color: #58a6ff; border-bottom: 2px solid #58a6ff; }
-  .tab:hover { color: #c9d1d9; }
-  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
-  #filterInput { padding: 8px; width: 300px; background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px; }
-  button { padding: 8px 16px; background: #238636; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-  button:hover { background: #2ea043; }
-  button:disabled { background: #30363d; cursor: not-allowed; }
-  #status { color: #8b949e; margin-left: 10px; }
-  #count { color: #8b949e; margin: 10px 0; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { padding: 10px; text-align: left; border-bottom: 1px solid #30363d; font-size: 14px; }
-  th { background: #161b22; color: #58a6ff; }
-  tr:hover { background: #161b22; }
-  .sev-high { border-left: 4px solid #f85149; }
-  .sev-medium { border-left: 4px solid #d29922; }
-  .sev-low { border-left: 4px solid #3fb950; }
-  .badge { padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-  .badge-high { background: #f85149; color: #fff; }
-  .badge-medium { background: #d29922; color: #000; }
-  .badge-low { background: #3fb950; color: #000; }
-  #vmBanner { display:none; background:#f85149; color:#fff; padding:10px 15px; border-radius:6px; margin-bottom:15px; font-weight:bold; }
-  #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
-  #modalBox { background: #161b22; padding: 20px; border-radius: 8px; width: 320px; }
-  #modalBox input { width: 100%; padding: 8px; margin: 10px 0; background: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 4px; box-sizing: border-box; }
+  :root {
+    --bg: #0b0e14;
+    --panel: #131722;
+    --panel-2: #171b26;
+    --border: #262b38;
+    --text: #d7dbe4;
+    --muted: #8891a3;
+    --accent: #4c8dff;
+    --high: #f0505a;
+    --medium: #e0a52c;
+    --low: #35c07a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 24px 28px;
+  }
+  a { color: var(--accent); }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+  h1 { font-size: 20px; margin: 0; color: #fff; font-weight: 600; }
+  .subtitle { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .pill {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill::before { content: "●"; font-size: 9px; }
+  .pill-up { background: rgba(53,192,122,0.12); color: var(--low); }
+  .pill-down { background: rgba(240,80,90,0.12); color: var(--high); }
+  .pill-unknown { background: rgba(136,145,163,0.12); color: var(--muted); }
+
+  button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    background: var(--panel-2);
+    color: var(--text);
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { filter: brightness(1.1); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .kpi-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .kpi-value { font-size: 24px; font-weight: 700; color: #fff; }
+  .kpi-card.kpi-high .kpi-value { color: var(--high); }
+
+  .toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .auto-hunt-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  select {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; font-size: 13px;
+  }
+
+  .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #30363d; transition: .2s; border-radius: 20px;
+  }
+  .slider::before {
+    position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+    background-color: white; transition: .2s; border-radius: 50%;
+  }
+  input:checked + .slider { background-color: var(--accent); }
+  input:checked + .slider::before { transform: translateX(18px); }
+
+  #status { color: var(--muted); font-size: 13px; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 4px; width: fit-content; }
+  .tab { padding: 8px 16px; cursor: pointer; color: var(--muted); border-radius: 7px; font-size: 13px; font-weight: 600; }
+  .tab.active { color: #fff; background: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  #filterInput {
+    padding: 9px 12px; width: 320px; background: var(--panel); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; font-size: 13px;
+  }
+  #count { color: var(--muted); margin-bottom: 10px; font-size: 13px; }
+  #severityChart { max-height: 140px; margin-bottom: 18px; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 11px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+  th { background: var(--panel-2); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+  th[data-sort] { cursor: pointer; user-select: none; }
+  th[data-sort]:hover { color: var(--accent); }
+  tr:hover td { background: var(--panel-2); }
+  tr:last-child td { border-bottom: none; }
+
+  .row-high { border-left: 3px solid var(--high); }
+  .row-medium { border-left: 3px solid var(--medium); }
+  .row-low { border-left: 3px solid var(--low); }
+
+  .badge { padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+  .badge-high { background: rgba(240,80,90,0.15); color: var(--high); }
+  .badge-medium { background: rgba(224,165,44,0.15); color: var(--medium); }
+  .badge-low { background: rgba(53,192,122,0.15); color: var(--low); }
+
+  .incident-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--medium);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .incident-card.sev-high { border-left-color: var(--high); }
+  .incident-card.sev-medium { border-left-color: var(--medium); }
+  .incident-card.sev-low { border-left-color: var(--low); }
+  .incident-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .incident-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .incident-desc { color: var(--muted); font-size: 13px; margin: 8px 0; line-height: 1.5; }
+  .incident-meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .incident-meta b { color: var(--text); }
+  .mitre-badge {
+    display: inline-block; background: rgba(76,141,255,0.12); color: var(--accent);
+    padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 700; margin-right: 6px; margin-bottom: 4px;
+  }
+  .timeline-label { font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  .timeline-list { list-style: none; margin: 0; padding: 0; }
+  .timeline-list li {
+    font-size: 12.5px; padding: 6px 0 6px 16px; border-left: 2px solid var(--border);
+    margin-left: 4px; position: relative; color: var(--text);
+  }
+  .timeline-list li::before {
+    content: ""; position: absolute; left: -5px; top: 11px; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--accent);
+  }
+
+  #modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.65); align-items: center; justify-content: center; z-index: 50;
+  }
+  #modalBox { background: var(--panel); border: 1px solid var(--border); padding: 22px; border-radius: 12px; width: 340px; }
+  #modalBox h3 { margin: 0 0 6px; color: #fff; font-size: 16px; }
+  #modalBox p { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  #modalBox input {
+    width: 100%; padding: 9px; margin-bottom: 6px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 13px;
+  }
+  #modalError { color: var(--high); font-size: 12px; min-height: 16px; margin-bottom: 8px; }
 </style>
 </head>
 <body>
-  <h1>Endpoint Threat Detection — SOC Console</h1>
-  <div id="vmBanner">VM is not running — power it on before running a new hunt.</div>
-  <div class="subtitle" id="folderInfo">Loading latest detections...</div>
 
-  <div class="toolbar">
-    <button id="refreshBtn">Refresh</button>
-    <button id="runHuntBtn">Run New Hunt</button>
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-dot"></div>
+      <div>
+        <h1>Endpoint Threat Detection — SOC Console</h1>
+        <div class="subtitle" id="folderInfo">Loading latest detections...</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span id="vmPill" class="pill pill-unknown">VM unknown</span>
+      <button id="refreshBtn">Refresh</button>
+      <button id="runHuntBtn" class="primary">Run New Hunt</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Detections</div>
+      <div class="kpi-value" id="kpiTotal">0</div>
+    </div>
+    <div class="kpi-card kpi-high">
+      <div class="kpi-label">High Severity</div>
+      <div class="kpi-value" id="kpiHigh">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Correlated Incidents</div>
+      <div class="kpi-value" id="kpiIncidents">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Last Hunt</div>
+      <div class="kpi-value" id="kpiLastHunt" style="font-size:14px;">—</div>
+    </div>
+  </div>
+
+  <div class="toolbar-row">
+    <div class="auto-hunt-group">
+      <label class="switch">
+        <input type="checkbox" id="autoHuntToggle">
+        <span class="slider"></span>
+      </label>
+      <span>Auto-hunt every</span>
+      <select id="autoHuntInterval">
+        <option value="5">5 min</option>
+        <option value="15" selected>15 min</option>
+        <option value="30">30 min</option>
+        <option value="60">60 min</option>
+      </select>
+      <span id="autoHuntStatus"></span>
+    </div>
     <span id="status"></span>
   </div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="sysmon">Sysmon</div>
-    <div class="tab" data-tab="security_custom">Security (Custom Rules)</div>
-    <div class="tab" data-tab="security_adopted">Security (Adopted Rules)</div>
+    <div class="tab active" data-tab="sysmon">Sysmon (Custom)</div>
+    <div class="tab" data-tab="sysmon_community">Sysmon (Community)</div>
+    <div class="tab" data-tab="security_custom">Security (Custom)</div>
+    <div class="tab" data-tab="security_adopted">Security (Adopted)</div>
+    <div class="tab" data-tab="incidents">Incidents</div>
   </div>
 
   <input type="text" id="filterInput" placeholder="Filter by rule name, technique, or process...">
   <div id="count"></div>
-  <table>
-    <thead>
-      <tr><th>Timestamp</th><th>Detection</th><th>Event ID</th><th>Computer</th><th>Severity</th></tr>
-    </thead>
-    <tbody id="resultsBody"></tbody>
-  </table>
+  <canvas id="severityChart"></canvas>
+
+  <div class="panel" id="tableWrap">
+    <table id="alertsTable">
+      <thead>
+        <tr>
+          <th data-sort="timestamp">Timestamp ⇅</th>
+          <th>Detection</th>
+          <th>Event ID</th>
+          <th>Computer</th>
+          <th data-sort="severity">Severity ⇅</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <div id="incidentsView" style="display:none;"></div>
 
   <div id="modal">
     <div id="modalBox">
-      <h3 style="margin-top:0; color:#58a6ff;">Run New Hunt</h3>
-      <p style="color:#8b949e; font-size:13px;">Enter the VM guest password to export logs and run Chainsaw.</p>
+      <h3 id="modalTitle">Run New Hunt</h3>
+      <p id="modalSubtitle">Enter the VM guest password to export logs and run Chainsaw.</p>
       <input type="password" id="passwordInput" placeholder="VM guest password">
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button id="confirmRunBtn">Run</button>
-        <button id="cancelRunBtn" style="background:#30363d;">Cancel</button>
+      <div id="modalError"></div>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button id="confirmRunBtn" class="primary">Run</button>
+        <button id="cancelRunBtn">Cancel</button>
       </div>
     </div>
   </div>
 
 <script>
 window.onerror = function(message, source, lineno) {
-  document.getElementById('folderInfo').textContent = 'JS ERROR: ' + message + ' (line ' + lineno + ')';
-  document.getElementById('folderInfo').style.color = '#f85149';
+  var el = document.getElementById('folderInfo');
+  if (el) {
+    el.textContent = 'JS ERROR: ' + message + ' (line ' + lineno + ')';
+    el.style.color = '#f0505a';
+  }
 };
 
-let dataStore = { sysmon: [], security_custom: [], security_adopted: [] };
+let dataStore = { sysmon: [], sysmon_community: [], security_custom: [], security_adopted: [], incidents: [] };
 let currentTab = 'sysmon';
+let sortField = 'timestamp';
+let sortDirection = 'desc';
+let chartInstance = null;
+let modalPurpose = 'single'; // 'single' or 'auto'
+
+const severityRank = { high: 3, medium: 2, low: 1 };
 
 function guessSeverity(detectionName) {
   const name = (detectionName || '').toLowerCase();
-  if (name.includes('cleared') || name.includes('encoded') || name.includes('registry run key')) return 'high';
-  if (name.includes('scheduled task') || name.includes('hidden') || name.includes('extensions')) return 'medium';
+  if (name.includes('cleared') || name.includes('encoded') || name.includes('registry run key') || name.includes('mimikatz') || name.includes('credential')) return 'high';
+  if (name.includes('scheduled task') || name.includes('hidden') || name.includes('extensions') || name.includes('failed logon')) return 'medium';
   return 'low';
+}
+
+function allAlertRows() {
+  return [].concat(dataStore.sysmon, dataStore.sysmon_community, dataStore.security_custom, dataStore.security_adopted);
+}
+
+function updateKpis() {
+  const all = allAlertRows();
+  const high = all.filter(r => guessSeverity(r.detections) === 'high').length;
+  document.getElementById('kpiTotal').textContent = all.length;
+  document.getElementById('kpiHigh').textContent = high;
+  document.getElementById('kpiIncidents').textContent = dataStore.incidents.length;
 }
 
 function renderTable() {
   const rows = dataStore[currentTab] || [];
   const filterVal = document.getElementById('filterInput').value.toLowerCase();
-  const filtered = filterVal
+  let filtered = filterVal
     ? rows.filter(r => JSON.stringify(r).toLowerCase().includes(filterVal))
-    : rows;
+    : rows.slice();
+
+  filtered.sort((a, b) => {
+    let valA, valB;
+    if (sortField === 'severity') {
+      valA = severityRank[guessSeverity(a.detections)] || 0;
+      valB = severityRank[guessSeverity(b.detections)] || 0;
+    } else {
+      valA = a.timestamp || '';
+      valB = b.timestamp || '';
+    }
+    if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   const body = document.getElementById('resultsBody');
   body.innerHTML = '';
@@ -103,7 +364,7 @@ function renderTable() {
   filtered.forEach(r => {
     const sev = guessSeverity(r.detections);
     const tr = document.createElement('tr');
-    tr.className = 'sev-' + sev;
+    tr.className = 'row-' + sev;
     tr.innerHTML = '<td>' + (r.timestamp || '') + '</td>' +
       '<td>' + (r.detections || '') + '</td>' +
       '<td>' + (r['Event ID'] || '') + '</td>' +
@@ -111,6 +372,96 @@ function renderTable() {
       '<td><span class="badge badge-' + sev + '">' + sev.toUpperCase() + '</span></td>';
     body.appendChild(tr);
   });
+
+  renderChart(filtered);
+}
+
+function renderChart(rows) {
+  const counts = { high: 0, medium: 0, low: 0 };
+  rows.forEach(r => { counts[guessSeverity(r.detections)]++; });
+
+  const ctx = document.getElementById('severityChart');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['High', 'Medium', 'Low'],
+      datasets: [{
+        data: [counts.high, counts.medium, counts.low],
+        backgroundColor: ['#f0505a', '#e0a52c', '#35c07a'],
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#8891a3' }, grid: { color: '#262b38' } },
+        y: { ticks: { color: '#d7dbe4' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderIncidents() {
+  const container = document.getElementById('incidentsView');
+  const filterVal = document.getElementById('filterInput').value.toLowerCase();
+  const incidents = dataStore.incidents.filter(inc =>
+    !filterVal || JSON.stringify(inc).toLowerCase().includes(filterVal)
+  );
+
+  document.getElementById('count').textContent = incidents.length + ' incident(s)';
+  container.innerHTML = '';
+
+  if (incidents.length === 0) {
+    container.innerHTML = '<div class="panel" style="padding:24px; color:#8891a3; text-align:center;">No correlated incidents yet. Run a hunt after simulating a multi-stage attack.</div>';
+    return;
+  }
+
+  incidents.forEach(inc => {
+    const card = document.createElement('div');
+    card.className = 'incident-card sev-' + inc.severity;
+
+    const mitreBadges = (inc.mitre_techniques || []).map(t =>
+      '<span class="mitre-badge">' + t.id + ' — ' + t.tactic + '</span>'
+    ).join('');
+
+    const stagesList = (inc.events || []).map(e =>
+      '<li>' + e.timestamp + ' — ' + e.detection + ' (user: ' + e.user + ')</li>'
+    ).join('');
+
+    card.innerHTML =
+      '<div class="incident-header">' +
+        '<div class="incident-title">' + inc.pattern_name + '</div>' +
+        '<span class="badge badge-' + inc.severity + '">' + inc.severity.toUpperCase() + '</span>' +
+      '</div>' +
+      '<div class="incident-desc">' + inc.description + '</div>' +
+      '<div class="incident-meta"><b>Host:</b> ' + inc.computer + ' &nbsp; <b>User(s):</b> ' + (inc.users || []).join(', ') + ' &nbsp; <b>Confidence:</b> ' + inc.confidence + '</div>' +
+      '<div>' + mitreBadges + '</div>' +
+      '<div class="timeline-label">Timeline (' + inc.stage_count + ' stages)</div>' +
+      '<ul class="timeline-list">' + stagesList + '</ul>';
+
+    container.appendChild(card);
+  });
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  const tableWrap = document.getElementById('tableWrap');
+  const chart = document.getElementById('severityChart');
+  const incidentsView = document.getElementById('incidentsView');
+
+  if (currentTab === 'incidents') {
+    tableWrap.style.display = 'none';
+    chart.style.display = 'none';
+    incidentsView.style.display = 'block';
+    renderIncidents();
+  } else {
+    tableWrap.style.display = 'block';
+    chart.style.display = 'block';
+    incidentsView.style.display = 'none';
+    renderTable();
+  }
 }
 
 async function loadLatest() {
@@ -119,15 +470,24 @@ async function loadLatest() {
     const res = await fetch('/api/latest');
     const data = await res.json();
     dataStore.sysmon = data.sysmon.rows;
+    dataStore.sysmon_community = (data.sysmon_community && data.sysmon_community.rows) || [];
     dataStore.security_custom = data.security_custom.rows;
     dataStore.security_adopted = data.security_adopted.rows;
 
     document.getElementById('folderInfo').textContent =
       'Sysmon: ' + (data.sysmon.folder || 'none') +
+      ' | Community: ' + ((data.sysmon_community && data.sysmon_community.folder) || 'none') +
       ' | Security (custom): ' + (data.security_custom.folder || 'none') +
       ' | Security (adopted): ' + (data.security_adopted.folder || 'none');
 
-    renderTable();
+    document.getElementById('kpiLastHunt').textContent = data.last_hunt || 'never';
+
+    const incRes = await fetch('/api/incidents');
+    const incData = await incRes.json();
+    dataStore.incidents = incData.incidents || [];
+
+    updateKpis();
+    showTab(currentTab);
     document.getElementById('status').textContent = '';
   } catch (err) {
     document.getElementById('status').textContent = 'Error loading data: ' + err;
@@ -138,37 +498,129 @@ async function checkVmStatus() {
   try {
     const res = await fetch('/api/vm-status');
     const data = await res.json();
-    const banner = document.getElementById('vmBanner');
-    banner.style.display = data.running ? 'none' : 'block';
+    const pill = document.getElementById('vmPill');
+    if (data.running) {
+      pill.className = 'pill pill-up';
+      pill.textContent = 'VM running';
+    } else {
+      pill.className = 'pill pill-down';
+      pill.textContent = 'VM offline';
+    }
   } catch (err) {
     console.error('VM status check failed:', err);
   }
 }
 
-document.querySelectorAll('.tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-    tab.classList.add('active');
-    currentTab = tab.dataset.tab;
+async function checkAutoHuntStatus() {
+  try {
+    const res = await fetch('/api/auto-hunt/status');
+    const data = await res.json();
+    document.getElementById('autoHuntToggle').checked = data.enabled;
+    document.getElementById('autoHuntInterval').value = String(data.interval_minutes);
+    const statusEl = document.getElementById('autoHuntStatus');
+    if (data.enabled) {
+      statusEl.textContent = 'Active — last run: ' + (data.last_run || 'pending');
+      statusEl.style.color = '#35c07a';
+    } else {
+      statusEl.textContent = data.last_error ? ('Stopped: ' + data.last_error) : '';
+      statusEl.style.color = '#8891a3';
+    }
+  } catch (err) {
+    console.error('Auto-hunt status check failed:', err);
+  }
+}
+
+document.querySelectorAll('th[data-sort]').forEach(function(th) {
+  th.addEventListener('click', function() {
+    const field = th.dataset.sort;
+    if (sortField === field) {
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortField = field;
+      sortDirection = 'desc';
+    }
     renderTable();
   });
 });
 
-document.getElementById('filterInput').addEventListener('input', renderTable);
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    showTab(tab.dataset.tab);
+  });
+});
+
+document.getElementById('filterInput').addEventListener('input', function() {
+  showTab(currentTab);
+});
 document.getElementById('refreshBtn').addEventListener('click', loadLatest);
 
-document.getElementById('runHuntBtn').addEventListener('click', function() {
+function openModal(purpose) {
+  modalPurpose = purpose;
+  document.getElementById('modalError').textContent = '';
+  document.getElementById('passwordInput').value = '';
+  if (purpose === 'auto') {
+    document.getElementById('modalTitle').textContent = 'Enable Auto-Hunt';
+    document.getElementById('modalSubtitle').textContent = 'Password is kept in memory only for this session, never saved to disk.';
+  } else {
+    document.getElementById('modalTitle').textContent = 'Run New Hunt';
+    document.getElementById('modalSubtitle').textContent = 'Enter the VM guest password to export logs and run Chainsaw.';
+  }
   document.getElementById('modal').style.display = 'flex';
+}
+
+document.getElementById('runHuntBtn').addEventListener('click', function() {
+  openModal('single');
 });
 document.getElementById('cancelRunBtn').addEventListener('click', function() {
   document.getElementById('modal').style.display = 'none';
+  if (modalPurpose === 'auto') {
+    document.getElementById('autoHuntToggle').checked = false;
+  }
 });
 
 document.getElementById('confirmRunBtn').addEventListener('click', async function() {
   const password = document.getElementById('passwordInput').value;
-  if (!password) return;
-  document.getElementById('modal').style.display = 'none';
-  document.getElementById('status').textContent = 'Running hunt... this takes ~30-60s';
+  const errorEl = document.getElementById('modalError');
+  if (!password) {
+    errorEl.textContent = 'Password is required.';
+    return;
+  }
+
+  document.getElementById('confirmRunBtn').disabled = true;
+  errorEl.textContent = '';
+
+  if (modalPurpose === 'auto') {
+    const interval = parseInt(document.getElementById('autoHuntInterval').value, 10);
+    try {
+      const res = await fetch('/api/auto-hunt/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password, interval_minutes: interval })
+      });
+      const result = await res.json();
+      document.getElementById('confirmRunBtn').disabled = false;
+
+      if (result.auth_error) {
+        errorEl.textContent = 'Incorrect password. Please try again.';
+        return; // keep modal open for retry
+      }
+      if (!result.success) {
+        errorEl.textContent = result.error || 'Failed to enable auto-hunt.';
+        return;
+      }
+      document.getElementById('modal').style.display = 'none';
+      checkAutoHuntStatus();
+    } catch (err) {
+      document.getElementById('confirmRunBtn').disabled = false;
+      errorEl.textContent = 'Request error: ' + err;
+    }
+    return;
+  }
+
+  // single hunt
+  document.getElementById('status').textContent = 'Running hunt... this takes 30-90s';
   document.getElementById('runHuntBtn').disabled = true;
 
   try {
@@ -178,23 +630,54 @@ document.getElementById('confirmRunBtn').addEventListener('click', async functio
       body: JSON.stringify({ password: password })
     });
     const result = await res.json();
-    document.getElementById('passwordInput').value = '';
+    document.getElementById('confirmRunBtn').disabled = false;
+
+    if (result.auth_error) {
+      errorEl.textContent = 'Incorrect password. Please try again.';
+      document.getElementById('status').textContent = '';
+      document.getElementById('runHuntBtn').disabled = false;
+      return; // keep modal open for retry
+    }
+
+    document.getElementById('modal').style.display = 'none';
 
     if (result.success) {
       document.getElementById('status').textContent = 'Hunt complete. Refreshing...';
       await loadLatest();
     } else {
-      document.getElementById('status').textContent = 'Hunt failed: ' + (result.error || result.stderr || 'unknown error');
+      document.getElementById('status').textContent = 'Hunt failed: ' + (result.error || 'unknown error');
     }
   } catch (err) {
+    document.getElementById('confirmRunBtn').disabled = false;
     document.getElementById('status').textContent = 'Request error: ' + err;
   }
   document.getElementById('runHuntBtn').disabled = false;
 });
 
+document.getElementById('autoHuntToggle').addEventListener('change', async function(e) {
+  if (e.target.checked) {
+    openModal('auto');
+  } else {
+    await fetch('/api/auto-hunt/stop', { method: 'POST' });
+    checkAutoHuntStatus();
+  }
+});
+
+document.getElementById('autoHuntInterval').addEventListener('change', async function() {
+  const status = await (await fetch('/api/auto-hunt/status')).json();
+  if (status.enabled) {
+    // restart with new interval, same password won't be re-asked; simplest: stop and prompt again
+    await fetch('/api/auto-hunt/stop', { method: 'POST' });
+    openModal('auto');
+  }
+});
+
 loadLatest();
 checkVmStatus();
+checkAutoHuntStatus();
 setInterval(checkVmStatus, 15000);
+setInterval(checkAutoHuntStatus, 15000);
+setInterval(loadLatest, 30000);
 </script>
 </body>
 </html>

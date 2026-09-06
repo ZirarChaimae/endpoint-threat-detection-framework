@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import subprocess
 import csv
 import os
+import json
 from pathlib import Path
 
 app = Flask(__name__)
@@ -45,6 +46,20 @@ def latest():
 VMX_PATH = r"C:\Users\Zirar\Documents\Virtual Machines\Windows 10 (Log Source)\Windows 10 (Log Source).vmx"
 VMRUN_PATH = r"C:\Program Files\VMware\VMware Workstation\vmrun.exe"
 
+@app.route("/api/incidents")
+def incidents():
+    incidents_dir = REPO_ROOT / "correlation" / "incidents"
+    if not incidents_dir.exists():
+        return jsonify({"incidents": [], "file": None})
+
+    files = sorted(incidents_dir.glob("incidents_*.json"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not files:
+        return jsonify({"incidents": [], "file": None})
+
+    with open(files[0], encoding="utf-8") as f:
+        data = json.load(f)
+    return jsonify({"incidents": data, "file": files[0].name})
+
 
 @app.route("/api/vm-status")
 def vm_status():
@@ -80,6 +95,9 @@ def run_hunt():
              errors="replace",
              timeout=600
         )
+                # Run correlation engine automatically after the hunt
+        correlate_script = REPO_ROOT / "correlation" / "correlate.py"
+        subprocess.run(["python", str(correlate_script)], capture_output=True, text=True, timeout=60)
     except subprocess.TimeoutExpired:
         return jsonify({"success": False, "error": "Hunt timed out after 10 minutes — community ruleset may be too slow on this machine."}), 500  
 
