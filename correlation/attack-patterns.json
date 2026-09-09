@@ -4,9 +4,11 @@
       "id": "phishing-to-persistence",
       "name": "Phishing/PowerShell to Registry Persistence",
       "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+      "type": "chain",
       "time_window_minutes": 10,
       "severity": "high",
       "confidence": "high",
+      "require_same_computer": true,
       "stages": [
         { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
         { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
@@ -16,13 +18,15 @@
       "id": "execution-to-lateral-movement",
       "name": "Execution to Credential Access to Discovery to Lateral Movement",
       "description": "A staged intrusion progressing from code execution through credential access, host/network discovery, and an attempt at lateral movement.",
+      "type": "chain",
       "time_window_minutes": 15,
       "severity": "high",
       "confidence": "medium",
+      "require_same_computer": true,
       "stages": [
         { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
         { "match_contains": "Failed Logon", "mitre": "T1110", "tactic": "Credential Access" },
-        { "match_contains": "Discovery", "mitre": "T1082", "tactic": "Discovery" },
+        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
         { "match_contains": "Remote System Discovery", "mitre": "T1018", "tactic": "Discovery" }
       ]
     },
@@ -30,12 +34,54 @@
       "id": "compromise-to-staging",
       "name": "Compromise to Scheduled Task to Command Execution to Data Staging",
       "description": "Persistence established via scheduled task, followed by command execution and preparation of data for exfiltration.",
+      "type": "chain",
       "time_window_minutes": 15,
       "severity": "medium",
       "confidence": "medium",
+      "require_same_computer": true,
       "stages": [
         { "match_contains": "Scheduled Task", "mitre": "T1053.005", "tactic": "Persistence" },
         { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" }
+      ]
+    },
+    {
+      "id": "reconnaissance-sweep",
+      "name": "Reconnaissance Sweep (System, Process, and Network Discovery)",
+      "description": "Sequential host and network enumeration -- system information gathering, running-process enumeration, and an outbound connectivity probe -- consistent with an attacker mapping the environment before further action.",
+      "type": "chain",
+      "time_window_minutes": 10,
+      "severity": "medium",
+      "confidence": "medium",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
+        { "match_contains": "Process Discovery", "mitre": "T1057", "tactic": "Discovery" },
+        { "match_contains": "Remote System Discovery", "mitre": "T1018", "tactic": "Discovery" }
+      ]
+    },
+    {
+      "id": "evasion-preparation",
+      "name": "Evasion Preparation (Hidden Extensions to Encoded Execution)",
+      "description": "File-extension hiding followed by an encoded PowerShell execution, consistent with an attacker preparing a disguised payload before running it.",
+      "type": "chain",
+      "time_window_minutes": 10,
+      "severity": "medium",
+      "confidence": "medium",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "File Extensions Hidden", "mitre": "T1112", "tactic": "Defense Evasion" },
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" }
+      ]
+    },
+    {
+      "id": "event-log-cleared-alone",
+      "name": "Security Event Log Cleared (Anti-Forensics)",
+      "description": "The Security event log was cleared. Reported as a standalone incident regardless of surrounding events, since this action alone destroys evidence and warrants investigation on its own merits.",
+      "type": "single_event",
+      "severity": "high",
+      "confidence": "high",
+      "stages": [
+        { "match_contains": "Event Log Cleared", "mitre": "T1070.001", "tactic": "Defense Evasion" }
       ]
     }
   ]
