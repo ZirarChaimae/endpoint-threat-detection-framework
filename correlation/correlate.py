@@ -20,9 +20,13 @@ def find_latest_folder(prefix):
 
 
 def load_all_detections():
-    """Combine rows from the custom + community sysmon hunts into one list."""
+    """Combine rows from the sysmon (custom + community) AND security (custom +
+    adopted) hunts into one list. Security-log rules -- Failed Logon, Account
+    Tampering -- live in security-custom-*/security-adopted-* folders, not the
+    sysmon-* ones, so both families have to be read for any pattern that uses
+    a Security-log detection to ever have a chance of matching."""
     rows = []
-    for prefix in ["sysmon-community-", "sysmon-custom-"]:
+    for prefix in ["sysmon-community-", "sysmon-custom-", "security-custom-", "security-adopted-"]:
         folder = find_latest_folder(prefix)
         if not folder:
             continue
