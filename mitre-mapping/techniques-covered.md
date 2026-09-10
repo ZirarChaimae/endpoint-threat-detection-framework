@@ -57,3 +57,8 @@ full SigmaHQ process-creation catalog rather than techniques hand-picked for thi
   Chainsaw, despite the Sigma rule and simulation both existing. Documented, not fixed.
 - The adopted rule (T1078) is deliberately narrow — it will not match a simple bad-password
   attempt. This is a documented finding about detection-rule specificity, not a bug.
+- T1078 (Suspicious Account Tampering) was tested directly against the raw Windows Security
+  log: a disabled-account logon attempt correctly produced `Sub Status: 0xC0000072`, exactly
+  the code the rule is written to catch. Chainsaw still did not surface a match. Verified as
+  a tool-level limitation (rule logic confirmed correct against ground truth), not pursued
+  further — closed as an accepted, documented gap rather than a fixed feature.
