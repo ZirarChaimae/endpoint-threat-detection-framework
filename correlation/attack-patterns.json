@@ -1,6 +1,22 @@
 {
   "patterns": [
     {
+      "id": "full-intrusion-chain",
+      "name": "Full Intrusion Chain (Recon to Execution to Persistence)",
+      "description": "A broader four-stage progression: host fingerprinting and process enumeration, followed by encoded PowerShell execution and registry-based persistence.",
+      "type": "chain",
+      "time_window_minutes": 15,
+      "severity": "high",
+      "confidence": "high",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
+        { "match_contains": "Process Discovery", "mitre": "T1057", "tactic": "Discovery" },
+        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
+        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+      ]
+    },
+    {
       "id": "phishing-to-persistence",
       "name": "Phishing/PowerShell to Registry Persistence",
       "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
@@ -71,6 +87,73 @@
       "stages": [
         { "match_contains": "File Extensions Hidden", "mitre": "T1112", "tactic": "Defense Evasion" },
         { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" }
+      ]
+    },
+    {
+      "id": "discovery-before-scheduled-persistence",
+      "name": "Discovery to Scheduled Task Persistence",
+      "description": "Process enumeration (possibly checking for security tools) followed by scheduled-task persistence.",
+      "type": "chain",
+      "time_window_minutes": 10,
+      "severity": "medium",
+      "confidence": "medium",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "Process Discovery", "mitre": "T1057", "tactic": "Discovery" },
+        { "match_contains": "Scheduled Task", "mitre": "T1053.005", "tactic": "Persistence" }
+      ]
+    },
+    {
+      "id": "discovery-before-registry-persistence",
+      "name": "Discovery to Registry Persistence",
+      "description": "Host fingerprinting followed directly by registry-based persistence, without an intermediate execution stage.",
+      "type": "chain",
+      "time_window_minutes": 10,
+      "severity": "medium",
+      "confidence": "medium",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
+        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+      ]
+    },
+    {
+      "id": "credential-access-to-log-clearing",
+      "name": "Credential Access to Evidence Destruction",
+      "description": "Failed logon attempts followed by clearing of the Security event log, consistent with an attacker covering their tracks after a credential-guessing attempt.",
+      "type": "chain",
+      "time_window_minutes": 15,
+      "severity": "high",
+      "confidence": "high",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "Failed Logon", "mitre": "T1110", "tactic": "Credential Access" },
+        { "match_contains": "Event Log Cleared", "mitre": "T1070.001", "tactic": "Defense Evasion" }
+      ]
+    },
+    {
+      "id": "evasion-to-persistence",
+      "name": "Evasion to Persistence (Hidden Extensions then Registry Run Key)",
+      "description": "File-extension hiding followed directly by registry-based persistence, without an intermediate execution stage.",
+      "type": "chain",
+      "time_window_minutes": 10,
+      "severity": "medium",
+      "confidence": "medium",
+      "require_same_computer": true,
+      "stages": [
+        { "match_contains": "File Extensions Hidden", "mitre": "T1112", "tactic": "Defense Evasion" },
+        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+      ]
+    },
+    {
+      "id": "account-tampering-alone",
+      "name": "Suspicious Account Tampering (Rare Failure Code)",
+      "description": "A failed logon with an uncommon failure reason (disabled account, restricted hours, unauthorized workstation, or trust failure), distinct from ordinary bad-password attempts.",
+      "type": "single_event",
+      "severity": "medium",
+      "confidence": "medium",
+      "stages": [
+        { "match_contains": "Suspicious Failed Logon Reasons", "mitre": "T1078", "tactic": "Initial Access / Persistence" }
       ]
     },
     {
