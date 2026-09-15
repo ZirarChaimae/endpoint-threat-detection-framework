@@ -3,7 +3,7 @@ param(
     [string]$GuestPassword
 )
 
-$vmx = "C:\Users\Zirar\Documents\Virtual Machines\Windows 10 (Log Source)\Windows 10 (Log Source).vmx"
+$vmx = "C:\Users\Zirar\Documents\Virtual Machines\Victim-Win10-v2\Victim-Win10.vmx"
 $vmrun = "C:\Program Files\VMware\VMware Workstation\vmrun.exe"
 $repo = "C:\Users\Zirar\Documents\endpoint-threat-detection-framework"
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"

@@ -14,7 +14,7 @@ DETECTIONS_DIR = REPO_ROOT / "detections" / "chainsaw-output"
 SCRIPT_PATH = REPO_ROOT / "scripts" / "export-and-copy.ps1"
 CORRELATE_SCRIPT = REPO_ROOT / "correlation" / "correlate.py"
 
-VMX_PATH = r"C:\Users\Zirar\Documents\Virtual Machines\Windows 10 (Log Source)\Windows 10 (Log Source).vmx"
+VMX_PATH = r"C:\Users\Zirar\Documents\Virtual Machines\Victim-Win10-v2\Victim-Win10.vmx"
 VMRUN_PATH = r"C:\Program Files\VMware\VMware Workstation\vmrun.exe"
 
 # In-memory only. Never written to disk, never committed.
