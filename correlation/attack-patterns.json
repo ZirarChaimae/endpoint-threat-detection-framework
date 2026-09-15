@@ -10,10 +10,26 @@
       "confidence": "high",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
-        { "match_contains": "Process Discovery", "mitre": "T1057", "tactic": "Discovery" },
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
-        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+        {
+          "match_contains": "System Information Discovery",
+          "mitre": "T1082",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Process Discovery",
+          "mitre": "T1057",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Encoded PowerShell",
+          "mitre": "T1059.001",
+          "tactic": "Execution"
+        },
+        {
+          "match_contains": "Registry Run Key",
+          "mitre": "T1547.001",
+          "tactic": "Persistence"
+        }
       ]
     },
     {
@@ -25,9 +41,21 @@
       "severity": "high",
       "confidence": "high",
       "require_same_computer": true,
+      "response_action": {
+        "type": "kill_process",
+        "target_stage_contains": "Encoded PowerShell"
+      },
       "stages": [
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
-        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+        {
+          "match_contains": "Encoded PowerShell",
+          "mitre": "T1059.001",
+          "tactic": "Execution"
+        },
+        {
+          "match_contains": "Registry Run Key",
+          "mitre": "T1547.001",
+          "tactic": "Persistence"
+        }
       ]
     },
     {
@@ -40,10 +68,26 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" },
-        { "match_contains": "Failed Logon", "mitre": "T1110", "tactic": "Credential Access" },
-        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
-        { "match_contains": "Remote System Discovery", "mitre": "T1018", "tactic": "Discovery" }
+        {
+          "match_contains": "Encoded PowerShell",
+          "mitre": "T1059.001",
+          "tactic": "Execution"
+        },
+        {
+          "match_contains": "Failed Logon",
+          "mitre": "T1110",
+          "tactic": "Credential Access"
+        },
+        {
+          "match_contains": "System Information Discovery",
+          "mitre": "T1082",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Remote System Discovery",
+          "mitre": "T1018",
+          "tactic": "Discovery"
+        }
       ]
     },
     {
@@ -56,8 +100,16 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "Scheduled Task", "mitre": "T1053.005", "tactic": "Persistence" },
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" }
+        {
+          "match_contains": "Scheduled Task",
+          "mitre": "T1053.005",
+          "tactic": "Persistence"
+        },
+        {
+          "match_contains": "Encoded PowerShell",
+          "mitre": "T1059.001",
+          "tactic": "Execution"
+        }
       ]
     },
     {
@@ -70,9 +122,21 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
-        { "match_contains": "Process Discovery", "mitre": "T1057", "tactic": "Discovery" },
-        { "match_contains": "Remote System Discovery", "mitre": "T1018", "tactic": "Discovery" }
+        {
+          "match_contains": "System Information Discovery",
+          "mitre": "T1082",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Process Discovery",
+          "mitre": "T1057",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Remote System Discovery",
+          "mitre": "T1018",
+          "tactic": "Discovery"
+        }
       ]
     },
     {
@@ -85,8 +149,16 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "File Extensions Hidden", "mitre": "T1112", "tactic": "Defense Evasion" },
-        { "match_contains": "Encoded PowerShell", "mitre": "T1059.001", "tactic": "Execution" }
+        {
+          "match_contains": "File Extensions Hidden",
+          "mitre": "T1112",
+          "tactic": "Defense Evasion"
+        },
+        {
+          "match_contains": "Encoded PowerShell",
+          "mitre": "T1059.001",
+          "tactic": "Execution"
+        }
       ]
     },
     {
@@ -99,8 +171,16 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "Process Discovery", "mitre": "T1057", "tactic": "Discovery" },
-        { "match_contains": "Scheduled Task", "mitre": "T1053.005", "tactic": "Persistence" }
+        {
+          "match_contains": "Process Discovery",
+          "mitre": "T1057",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Scheduled Task",
+          "mitre": "T1053.005",
+          "tactic": "Persistence"
+        }
       ]
     },
     {
@@ -113,8 +193,16 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "System Information Discovery", "mitre": "T1082", "tactic": "Discovery" },
-        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+        {
+          "match_contains": "System Information Discovery",
+          "mitre": "T1082",
+          "tactic": "Discovery"
+        },
+        {
+          "match_contains": "Registry Run Key",
+          "mitre": "T1547.001",
+          "tactic": "Persistence"
+        }
       ]
     },
     {
@@ -127,8 +215,16 @@
       "confidence": "high",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "Failed Logon", "mitre": "T1110", "tactic": "Credential Access" },
-        { "match_contains": "Event Log Cleared", "mitre": "T1070.001", "tactic": "Defense Evasion" }
+        {
+          "match_contains": "Failed Logon",
+          "mitre": "T1110",
+          "tactic": "Credential Access"
+        },
+        {
+          "match_contains": "Event Log Cleared",
+          "mitre": "T1070.001",
+          "tactic": "Defense Evasion"
+        }
       ]
     },
     {
@@ -141,8 +237,16 @@
       "confidence": "medium",
       "require_same_computer": true,
       "stages": [
-        { "match_contains": "File Extensions Hidden", "mitre": "T1112", "tactic": "Defense Evasion" },
-        { "match_contains": "Registry Run Key", "mitre": "T1547.001", "tactic": "Persistence" }
+        {
+          "match_contains": "File Extensions Hidden",
+          "mitre": "T1112",
+          "tactic": "Defense Evasion"
+        },
+        {
+          "match_contains": "Registry Run Key",
+          "mitre": "T1547.001",
+          "tactic": "Persistence"
+        }
       ]
     },
     {
@@ -153,7 +257,94 @@
       "severity": "medium",
       "confidence": "medium",
       "stages": [
-        { "match_contains": "Suspicious Failed Logon Reasons", "mitre": "T1078", "tactic": "Initial Access / Persistence" }
+        {
+          "match_contains": "Suspicious Failed Logon Reasons",
+          "mitre": "T1078",
+          "tactic": "Initial Access / Persistence"
+        }
+      ]
+    },
+    {
+      "id": "command-injection-web-to-endpoint",
+      "name": "Command Injection: Web Request to Spawned Process",
+      "description": "A request to a known command-injection-vulnerable web endpoint, immediately followed by the web server process spawning a shell or system utility on the same host -- the web-log and endpoint evidence for the same real intrusion, correlated together.",
+      "type": "chain",
+      "time_window_minutes": 2,
+      "severity": "high",
+      "confidence": "high",
+      "require_same_computer": true,
+      "response_action": {
+        "type": "kill_process",
+        "target_stage_contains": "Suspicious Child Process Spawned by Web Server"
+      },
+      "stages": [
+        {
+          "match_contains": "Command Injection Attempt",
+          "mitre": "T1190",
+          "tactic": "Initial Access"
+        },
+        {
+          "match_contains": "Suspicious Child Process Spawned by Web Server",
+          "mitre": "T1059",
+          "tactic": "Execution"
+        }
+      ]
+    },
+    {
+      "id": "sql-injection-alone",
+      "name": "SQL Injection (Web Application)",
+      "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+      "type": "single_event",
+      "severity": "high",
+      "confidence": "medium",
+      "response_action": {
+        "type": "block_ip",
+        "target_stage_contains": "SQL Injection Attempt"
+      },
+      "stages": [
+        {
+          "match_contains": "SQL Injection Attempt",
+          "mitre": "T1190",
+          "tactic": "Initial Access"
+        }
+      ]
+    },
+    {
+      "id": "path-traversal-alone",
+      "name": "Path Traversal / Local File Inclusion (Web Application)",
+      "description": "A request attempting to read files outside the web application's intended directory.",
+      "type": "single_event",
+      "severity": "high",
+      "confidence": "medium",
+      "response_action": {
+        "type": "block_ip",
+        "target_stage_contains": "Path Traversal Attempt"
+      },
+      "stages": [
+        {
+          "match_contains": "Path Traversal Attempt",
+          "mitre": "T1190",
+          "tactic": "Initial Access"
+        }
+      ]
+    },
+    {
+      "id": "xss-alone",
+      "name": "Cross-Site Scripting (Web Application)",
+      "description": "A request containing an unescaped script or event-handler payload reflected by the web application.",
+      "type": "single_event",
+      "severity": "medium",
+      "confidence": "medium",
+      "response_action": {
+        "type": "block_ip",
+        "target_stage_contains": "Cross-Site Scripting"
+      },
+      "stages": [
+        {
+          "match_contains": "Cross-Site Scripting",
+          "mitre": "T1190",
+          "tactic": "Initial Access"
+        }
       ]
     },
     {
@@ -164,7 +355,11 @@
       "severity": "high",
       "confidence": "high",
       "stages": [
-        { "match_contains": "Event Log Cleared", "mitre": "T1070.001", "tactic": "Defense Evasion" }
+        {
+          "match_contains": "Event Log Cleared",
+          "mitre": "T1070.001",
+          "tactic": "Defense Evasion"
+        }
       ]
     }
   ]

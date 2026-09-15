@@ -1,0 +1,43 @@
+title: Suspicious Child Process Spawned by Web Server
+id: 7f3c1e2a-9b4d-4a7c-8e3f-2d1c9a5b6e7f
+status: experimental
+description: >
+  Detects a command shell or common scripting/utility process spawned directly
+  by the Apache web server process (httpd.exe). Web server processes should
+  almost never spawn a shell during normal operation -- this is a strong
+  indicator of successful exploitation of a web application vulnerability
+  (e.g. OS command injection) allowing arbitrary command execution through
+  the web server's own privileges.
+references:
+  - https://attack.mitre.org/techniques/T1190/
+  - https://attack.mitre.org/techniques/T1059/
+author: Zirar Chaimae
+date: 2026-09-15
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_parent:
+    ParentImage|contains: 'httpd.exe'
+  selection_child:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+      - '\whoami.exe'
+      - '\net.exe'
+      - '\net1.exe'
+      - '\ping.exe'
+      - '\ipconfig.exe'
+      - '\nslookup.exe'
+  condition: selection_parent and selection_child
+falsepositives:
+  - Unlikely in a lab environment. In production, some monitoring/health-check
+    tooling occasionally shells out from a web server process -- verify
+    against your own environment's known-legitimate automation before
+    treating every hit as malicious.
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.execution
+  - attack.t1059

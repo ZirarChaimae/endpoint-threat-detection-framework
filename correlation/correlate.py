@@ -1,6 +1,7 @@
 import json
 import csv
 import re
+import socket
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -8,6 +9,11 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DETECTIONS_DIR = REPO_ROOT / "detections" / "chainsaw-output"
 PATTERNS_FILE = REPO_ROOT / "correlation" / "attack-patterns.json"
 OUTPUT_DIR = REPO_ROOT / "correlation" / "incidents"
+
+# Where weblog_detector.py writes its output. Adjust this path if your
+# detector writes somewhere else -- this is the one thing to confirm once
+# weblog_detector.py's actual code is available.
+WEBLOG_DETECTIONS_CSV = REPO_ROOT / "weblog" / "detections.csv"
 
 
 def find_latest_folder(prefix):
@@ -19,14 +25,14 @@ def find_latest_folder(prefix):
     return matching[0] if matching else None
 
 
-def load_all_detections():
+def load_sysmon_and_security_detections():
     """Combine rows from the sysmon (custom + community) AND security (custom +
     adopted) hunts into one list. Security-log rules -- Failed Logon, Account
     Tampering -- live in security-custom-*/security-adopted-* folders, not the
     sysmon-* ones, so both families have to be read for any pattern that uses
     a Security-log detection to ever have a chance of matching."""
     rows = []
-    for prefix in ["sysmon-community-", "sysmon-custom-", "security-custom-", "security-adopted-"]:
+    for prefix in ["sysmon-community-", "sysmon-custom-", "security-custom-", "security-adopted-", "weblog-"]:
         folder = find_latest_folder(prefix)
         if not folder:
             continue
@@ -39,14 +45,81 @@ def load_all_detections():
     return rows
 
 
+def load_web_detections():
+    """
+    Load web-attack detections produced by weblog_detector.py and normalize
+    them into the exact same row shape the Sysmon/Security loader produces
+    (a 'detections' field to match_contains against, a 'Computer' field for
+    the same-host check, an 'Event Data' text blob), so the existing chain-
+    matching logic works on them completely unmodified -- no special-casing
+    needed anywhere else in this file.
+
+    IMPORTANT: the 'Computer' field must identify the machine the attack
+    actually landed on (the Windows-DVWA host), not whatever machine
+    correlate.py happens to be running on. If weblog_detector.py's CSV
+    doesn't already have a 'computer' column, add one there (populated with
+    socket.gethostname() at the point the detection is written, on the
+    Windows-DVWA machine itself) rather than guessing it here.
+    """
+    rows = []
+    if not WEBLOG_DETECTIONS_CSV.exists():
+        return rows
+
+    with open(WEBLOG_DETECTIONS_CSV, encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            computer = row.get("computer") or row.get("hostname") or "unknown"
+            rows.append({
+                "timestamp": row.get("timestamp"),
+                "detections": row.get("attack_type", ""),
+                "Event ID": "weblog",
+                "Computer": computer,
+                "Event Data": (
+                    f"User: web-client\n"
+                    f"SourceIP: {row.get('source_ip', '')}\n"
+                    f"HttpMethod: {row.get('http_method', '')}\n"
+                    f"HttpPath: {row.get('http_path', '')}\n"
+                    f"HttpStatus: {row.get('http_status', '')}"
+                ),
+                # Carried through unchanged for later use (e.g. block_ip needs
+                # the real attacker IP, which only the web log actually has).
+                "source_ip": row.get("source_ip", ""),
+            })
+    return rows
+
+
+def load_all_detections():
+    """Every detection source this project has: endpoint (Sysmon/Security)
+    plus web (Apache access log via weblog_detector.py), merged into one flat
+    pool before correlation runs. This is what makes cross-schema patterns
+    possible -- from here on, a 'web' row and a 'Sysmon' row are just rows."""
+    return load_sysmon_and_security_detections() + load_web_detections()
+
+
 def parse_timestamp(ts_string):
     # Chainsaw timestamps look like: 2026-08-16T16:21:54.824220+00:00
+    # weblog_detector.py should emit the same ISO 8601 format; if it uses a
+    # different format, this will need a matching adjustment.
     return datetime.fromisoformat(ts_string.replace("Z", "+00:00"))
 
 
 def extract_user(event_data_text):
     match = re.search(r"^User:\s*(.+)$", event_data_text or "", re.MULTILINE)
     return match.group(1).strip() if match else "unknown"
+
+
+def extract_process_id(event_data_text):
+    match = re.search(r"^ProcessId:\s*(\d+)$", event_data_text or "", re.MULTILINE)
+    return match.group(1).strip() if match else None
+
+
+def extract_source_ip(event_data_text):
+    match = re.search(r"^SourceIp:\s*(.+)$", event_data_text or "", re.MULTILINE)
+    return match.group(1).strip() if match else None
+
+
+def extract_http_field(event_data_text, field_name):
+    match = re.search(rf"^{field_name}:\s*(.+)$", event_data_text or "", re.MULTILINE)
+    return match.group(1).strip() if match else None
 
 
 def build_incident(pattern, matched, start_ts, last_ts):
@@ -75,7 +148,11 @@ def build_incident(pattern, matched, start_ts, last_ts):
                 "timestamp": r.get("timestamp"),
                 "detection": r.get("detections"),
                 "event_id": r.get("Event ID"),
-                "user": extract_user(r.get("Event Data", ""))
+                "user": extract_user(r.get("Event Data", "")),
+                "process_id": extract_process_id(r.get("Event Data", "")),
+                "source_ip": extract_source_ip(r.get("Event Data", "")),
+                "http_method": extract_http_field(r.get("Event Data", ""), "HttpMethod"),
+                "http_path": extract_http_field(r.get("Event Data", ""), "HttpPath")
             }
             for r in matched_rows
         ]
@@ -86,7 +163,9 @@ def match_single_event_pattern(pattern, parsed, used):
     """
     'single_event' patterns don't chain -- every matching, not-yet-used event
     becomes its own standalone incident (e.g. 'Security Event Log Cleared' is
-    meaningful on its own, it doesn't need a second stage to matter).
+    meaningful on its own, it doesn't need a second stage to matter -- same
+    idea now applies to SQLi/XSS/Path Traversal web detections, which don't
+    have a reliable Sysmon-side follow-on the way Command Injection does).
     """
     incidents = []
     stage = pattern["stages"][0]
@@ -116,7 +195,10 @@ def match_chain_pattern(pattern, parsed, used):
     Entity check: if require_same_computer is true (default), a match is
     only accepted when every stage happened on the same Computer. A match
     that fits the time window but spans multiple hosts is discarded WITHOUT
-    consuming its events, so they remain available to other patterns.
+    consuming its events, so they remain available to other patterns. This
+    is exactly what makes the new cross-schema pattern safe: a web-log event
+    and a Sysmon event only combine into one incident when they share the
+    same Computer value, i.e. genuinely happened on the same machine.
 
     Known limitation: matching is greedy and chronological. Patterns earlier
     in attack-patterns.json get first claim on any event they match. This is
