@@ -4,3 +4,4 @@ response/__pycache__/
 response/audit-log.jsonl
 __pycache__/
 *.pyc
+webattack/access.log
