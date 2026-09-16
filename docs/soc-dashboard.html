@@ -202,6 +202,37 @@
     border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 13px;
   }
   #modalError { color: var(--high); font-size: 12px; min-height: 16px; margin-bottom: 8px; }
+
+  #respondModal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.65); align-items: center; justify-content: center; z-index: 51;
+  }
+  #respondModalBox { background: var(--panel); border: 1px solid var(--high); padding: 22px; border-radius: 12px; width: 360px; }
+  #respondModalBox h3 { margin: 0 0 6px; color: #fff; font-size: 16px; }
+  #respondModalBox p { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  #respondModalBox input {
+    width: 100%; padding: 9px; margin-bottom: 6px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 13px;
+  }
+  #respondError { color: var(--high); font-size: 12px; min-height: 16px; margin-bottom: 8px; }
+
+  .respond-btn {
+    margin-top: 10px; background: rgba(240,80,90,0.12); color: var(--high); border-color: var(--high);
+  }
+  .respond-btn:hover { background: var(--high); color: #fff; }
+  .report-btn {
+    margin-top: 10px; background: rgba(76,141,255,0.12); color: var(--accent); border-color: var(--accent);
+  }
+  .report-btn:hover { background: var(--accent); color: #fff; }
+  .respond-result { font-size: 12px; margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--panel-2); }
+  .respond-result.ok { color: var(--low); }
+  .respond-result.fail { color: var(--high); }
+
+  .webattack-card {
+    background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
+  }
+  .webattack-meta { font-size: 12px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -263,6 +294,7 @@
     <div class="tab" data-tab="sysmon_community">Sysmon (Community)</div>
     <div class="tab" data-tab="security_custom">Security (Custom)</div>
     <div class="tab" data-tab="security_adopted">Security (Adopted)</div>
+    <div class="tab" data-tab="webattacks">Web Attacks</div>
     <div class="tab" data-tab="incidents">Incidents</div>
   </div>
 
@@ -286,6 +318,13 @@
   </div>
 
   <div id="incidentsView" style="display:none;"></div>
+  <div id="webattacksView" style="display:none;">
+    <div id="webAttackDiagram" class="panel" style="padding:20px; margin-bottom:18px;"></div>
+    <div class="timeline-label" style="font-size:14px; color:#fff; margin-bottom:10px;">Web Attack Incidents (correlated, with response)</div>
+    <div id="webIncidentsList" style="margin-bottom:24px;"></div>
+    <div class="timeline-label" style="font-size:14px; color:#fff; margin-bottom:10px;">Raw Web Log Detections</div>
+    <div id="webRawList"></div>
+  </div>
 
   <div id="modal">
     <div id="modalBox">
@@ -300,6 +339,19 @@
     </div>
   </div>
 
+  <div id="respondModal">
+    <div id="respondModalBox">
+      <h3 id="respondTitle">Trigger Response</h3>
+      <p id="respondSubtitle"></p>
+      <input type="password" id="respondPasswordInput" placeholder="VM guest password (needed to kill a process; leave blank for a block-IP action)">
+      <div id="respondError"></div>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button id="confirmRespondBtn" class="primary" style="background:var(--high); border-color:var(--high);">Execute Live</button>
+        <button id="cancelRespondBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 window.onerror = function(message, source, lineno) {
   var el = document.getElementById('folderInfo');
@@ -309,12 +361,14 @@ window.onerror = function(message, source, lineno) {
   }
 };
 
-let dataStore = { sysmon: [], sysmon_community: [], security_custom: [], security_adopted: [], incidents: [] };
+let dataStore = { sysmon: [], sysmon_community: [], security_custom: [], security_adopted: [], webattacks: [], incidents: [] };
+let responseRules = {};
 let currentTab = 'sysmon';
 let sortField = 'timestamp';
 let sortDirection = 'desc';
 let chartInstance = null;
 let modalPurpose = 'single'; // 'single' or 'auto'
+let pendingResponse = null; // { pattern_id, incident, actionType }
 
 const severityRank = { high: 3, medium: 2, low: 1 };
 
@@ -404,46 +458,190 @@ function renderChart(rows) {
   });
 }
 
+function attackTypeColor(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('command injection')) return 'high';
+  if (n.includes('sql injection')) return 'high';
+  if (n.includes('path traversal')) return 'medium';
+  if (n.includes('cross-site') || n.includes('xss')) return 'medium';
+  return 'low';
+}
+
+function renderWebAttackDiagram() {
+  const el = document.getElementById('webAttackDiagram');
+  if (el.dataset.rendered) return; // static diagram, only needs building once
+  el.dataset.rendered = '1';
+  el.innerHTML =
+    '<svg width="100%" viewBox="0 0 900 190" style="max-height:190px;">' +
+    '<defs><marker id="da" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">' +
+    '<path d="M2 1L8 5L2 9" fill="none" stroke="currentColor" stroke-width="1.5"/></marker></defs>' +
+    '<style>.dbox{fill:var(--panel-2);stroke:var(--border);stroke-width:1;} .dtext{fill:var(--text);font:600 12px sans-serif;} .dsub{fill:var(--muted);font:11px sans-serif;} .dline{stroke:var(--accent);stroke-width:1.5;fill:none;}</style>' +
+    '<rect x="10" y="60" width="120" height="60" rx="8" class="dbox"/><text x="70" y="85" text-anchor="middle" class="dtext">Kali</text><text x="70" y="102" text-anchor="middle" class="dsub">Attacker</text>' +
+    '<line x1="130" y1="90" x2="200" y2="90" class="dline" marker-end="url(#da)"/>' +
+    '<rect x="200" y="60" width="120" height="60" rx="8" class="dbox"/><text x="260" y="85" text-anchor="middle" class="dtext">OPNsense</text><text x="260" y="102" text-anchor="middle" class="dsub">Firewall</text>' +
+    '<line x1="320" y1="90" x2="390" y2="90" class="dline" marker-end="url(#da)"/>' +
+    '<rect x="390" y="60" width="120" height="60" rx="8" class="dbox"/><text x="450" y="85" text-anchor="middle" class="dtext">DVWA</text><text x="450" y="102" text-anchor="middle" class="dsub">Apache + Windows</text>' +
+    '<line x1="480" y1="60" x2="530" y2="25" class="dline" marker-end="url(#da)"/>' +
+    '<line x1="480" y1="120" x2="530" y2="155" class="dline" marker-end="url(#da)"/>' +
+    '<rect x="530" y="0" width="150" height="50" rx="8" class="dbox"/><text x="605" y="20" text-anchor="middle" class="dtext">weblog_detector.py</text><text x="605" y="36" text-anchor="middle" class="dsub">SQLi / XSS / Traversal / Cmd Inj</text>' +
+    '<rect x="530" y="135" width="150" height="50" rx="8" class="dbox"/><text x="605" y="155" text-anchor="middle" class="dtext">Sysmon</text><text x="605" y="171" text-anchor="middle" class="dsub">Spawned process</text>' +
+    '<line x1="680" y1="25" x2="730" y2="80" class="dline" marker-end="url(#da)"/>' +
+    '<line x1="680" y1="160" x2="730" y2="100" class="dline" marker-end="url(#da)"/>' +
+    '<rect x="730" y="60" width="80" height="60" rx="8" class="dbox"/><text x="770" y="85" text-anchor="middle" class="dtext">Correlate</text><text x="770" y="102" text-anchor="middle" class="dsub">attack-patterns</text>' +
+    '<line x1="810" y1="90" x2="860" y2="90" class="dline" style="stroke:var(--high);" marker-end="url(#da)"/>' +
+    '<text x="865" y="80" class="dsub" style="fill:var(--high);">Respond</text>' +
+    '<text x="865" y="96" class="dsub" style="fill:var(--high);">kill /</text>' +
+    '<text x="865" y="110" class="dsub" style="fill:var(--high);">block</text>' +
+    '</svg>';
+}
+
+function renderWebAttacks() {
+  renderWebAttackDiagram();
+
+  const filterVal = document.getElementById('filterInput').value.toLowerCase();
+
+  const webIncidents = dataStore.incidents.filter(inc =>
+    WEB_USE_CASE_PATTERNS.includes(inc.pattern_id) &&
+    (!filterVal || JSON.stringify(inc).toLowerCase().includes(filterVal))
+  );
+  renderIncidentList('webIncidentsList', webIncidents);
+
+  const rows = (dataStore.webattacks || []).filter(r =>
+    !filterVal || JSON.stringify(r).toLowerCase().includes(filterVal)
+  );
+  document.getElementById('count').textContent = webIncidents.length + ' web incident(s), ' + rows.length + ' raw detection(s)';
+
+  const rawContainer = document.getElementById('webRawList');
+  rawContainer.innerHTML = '';
+  if (rows.length === 0) {
+    rawContainer.innerHTML = '<div class="panel" style="padding:24px; color:#8891a3; text-align:center;">No raw web-attack detections yet.</div>';
+    return;
+  }
+  rows.forEach(r => {
+    const sev = attackTypeColor(r.detections);
+    const eventData = r['Event Data'] || '';
+    const sourceIpMatch = eventData.match(/SourceIp:\s*(.+)/);
+    const pathMatch = eventData.match(/HttpPath:\s*(.+)/);
+    const methodMatch = eventData.match(/HttpMethod:\s*(.+)/);
+
+    const card = document.createElement('div');
+    card.className = 'webattack-card';
+    card.innerHTML =
+      '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+        '<div style="font-weight:700; color:#fff;">' + (r.detections || '') + '</div>' +
+        '<span class="badge badge-' + sev + '">' + sev.toUpperCase() + '</span>' +
+      '</div>' +
+      '<div class="webattack-meta" style="margin-top:6px;">' +
+        '<b>' + (methodMatch ? methodMatch[1] : '') + '</b> ' + (pathMatch ? pathMatch[1] : '') +
+      '</div>' +
+      '<div class="webattack-meta">Source: ' + (sourceIpMatch ? sourceIpMatch[1] : 'unknown') + ' &nbsp; | &nbsp; ' + (r.timestamp || '') + '</div>';
+    rawContainer.appendChild(card);
+  });
+}
+
+const WEB_USE_CASE_PATTERNS = [
+  'command-injection-web-to-endpoint',
+  'sql-injection-alone',
+  'path-traversal-alone',
+  'xss-alone'
+];
+
+function buildIncidentCardHtml(inc, globalIdx) {
+  const mitreBadges = (inc.mitre_techniques || []).map(t =>
+    '<span class="mitre-badge">' + t.id + ' — ' + t.tactic + '</span>'
+  ).join('');
+
+  const stagesList = (inc.events || []).map(e =>
+    '<li>' + e.timestamp + ' — ' + e.detection + ' (user: ' + e.user + ')</li>'
+  ).join('');
+
+  const rule = responseRules[inc.pattern_id];
+  let respondHtml = '';
+  if (rule) {
+    const actionLabel = rule.type === 'kill_process' ? 'Kill Process' : 'Block IP (via OPNsense)';
+    respondHtml = '<button class="respond-btn" data-incident-index="' + globalIdx + '">Respond — ' + actionLabel + '</button>' +
+      '<div class="respond-result" id="respondResult-' + globalIdx + '" style="display:none;"></div>';
+  }
+
+  return (
+    '<div class="incident-header">' +
+      '<div class="incident-title">' + inc.pattern_name + '</div>' +
+      '<span class="badge badge-' + inc.severity + '">' + inc.severity.toUpperCase() + '</span>' +
+    '</div>' +
+    '<div class="incident-desc">' + inc.description + '</div>' +
+    '<div class="incident-meta"><b>Host:</b> ' + inc.computer + ' &nbsp; <b>User(s):</b> ' + (inc.users || []).join(', ') + ' &nbsp; <b>Confidence:</b> ' + inc.confidence + '</div>' +
+    '<div>' + mitreBadges + '</div>' +
+    '<div class="timeline-label">Timeline (' + inc.stage_count + ' stages)</div>' +
+    '<ul class="timeline-list">' + stagesList + '</ul>' +
+    '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">' +
+      respondHtml +
+      '<button class="report-btn" data-incident-index="' + globalIdx + '">Download Report</button>' +
+    '</div>'
+  );
+}
+
+function attachIncidentCardHandlers(container) {
+  container.querySelectorAll('.respond-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const idx = parseInt(btn.dataset.incidentIndex, 10);
+      openRespondModal(dataStore.incidents[idx], idx);
+    });
+  });
+  container.querySelectorAll('.report-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const idx = parseInt(btn.dataset.incidentIndex, 10);
+      const inc = dataStore.incidents[idx];
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/generate-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ incident: inc })
+        });
+        const result = await res.json();
+        if (result.success) {
+          const blob = new Blob([result.markdown], { type: 'text/markdown' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'incident-' + inc.pattern_id + '-' + (inc.start_time || '').replace(/[:.]/g, '-') + '.md';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+function renderIncidentList(containerId, incidentsList) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  if (incidentsList.length === 0) {
+    container.innerHTML = '<div class="panel" style="padding:24px; color:#8891a3; text-align:center;">No correlated incidents yet.</div>';
+    return;
+  }
+
+  incidentsList.forEach(inc => {
+    const card = document.createElement('div');
+    card.className = 'incident-card sev-' + inc.severity;
+    const globalIdx = dataStore.incidents.indexOf(inc);
+    card.innerHTML = buildIncidentCardHtml(inc, globalIdx);
+    container.appendChild(card);
+  });
+
+  attachIncidentCardHandlers(container);
+}
+
 function renderIncidents() {
-  const container = document.getElementById('incidentsView');
   const filterVal = document.getElementById('filterInput').value.toLowerCase();
   const incidents = dataStore.incidents.filter(inc =>
     !filterVal || JSON.stringify(inc).toLowerCase().includes(filterVal)
   );
-
   document.getElementById('count').textContent = incidents.length + ' incident(s)';
-  container.innerHTML = '';
-
-  if (incidents.length === 0) {
-    container.innerHTML = '<div class="panel" style="padding:24px; color:#8891a3; text-align:center;">No correlated incidents yet. Run a hunt after simulating a multi-stage attack.</div>';
-    return;
-  }
-
-  incidents.forEach(inc => {
-    const card = document.createElement('div');
-    card.className = 'incident-card sev-' + inc.severity;
-
-    const mitreBadges = (inc.mitre_techniques || []).map(t =>
-      '<span class="mitre-badge">' + t.id + ' — ' + t.tactic + '</span>'
-    ).join('');
-
-    const stagesList = (inc.events || []).map(e =>
-      '<li>' + e.timestamp + ' — ' + e.detection + ' (user: ' + e.user + ')</li>'
-    ).join('');
-
-    card.innerHTML =
-      '<div class="incident-header">' +
-        '<div class="incident-title">' + inc.pattern_name + '</div>' +
-        '<span class="badge badge-' + inc.severity + '">' + inc.severity.toUpperCase() + '</span>' +
-      '</div>' +
-      '<div class="incident-desc">' + inc.description + '</div>' +
-      '<div class="incident-meta"><b>Host:</b> ' + inc.computer + ' &nbsp; <b>User(s):</b> ' + (inc.users || []).join(', ') + ' &nbsp; <b>Confidence:</b> ' + inc.confidence + '</div>' +
-      '<div>' + mitreBadges + '</div>' +
-      '<div class="timeline-label">Timeline (' + inc.stage_count + ' stages)</div>' +
-      '<ul class="timeline-list">' + stagesList + '</ul>';
-
-    container.appendChild(card);
-  });
+  renderIncidentList('incidentsView', incidents);
 }
 
 function showTab(tab) {
@@ -451,16 +649,22 @@ function showTab(tab) {
   const tableWrap = document.getElementById('tableWrap');
   const chart = document.getElementById('severityChart');
   const incidentsView = document.getElementById('incidentsView');
+  const webattacksView = document.getElementById('webattacksView');
+
+  tableWrap.style.display = 'none';
+  chart.style.display = 'none';
+  incidentsView.style.display = 'none';
+  webattacksView.style.display = 'none';
 
   if (currentTab === 'incidents') {
-    tableWrap.style.display = 'none';
-    chart.style.display = 'none';
     incidentsView.style.display = 'block';
     renderIncidents();
+  } else if (currentTab === 'webattacks') {
+    webattacksView.style.display = 'block';
+    renderWebAttacks();
   } else {
     tableWrap.style.display = 'block';
     chart.style.display = 'block';
-    incidentsView.style.display = 'none';
     renderTable();
   }
 }
@@ -474,6 +678,7 @@ async function loadLatest() {
     dataStore.sysmon_community = (data.sysmon_community && data.sysmon_community.rows) || [];
     dataStore.security_custom = data.security_custom.rows;
     dataStore.security_adopted = data.security_adopted.rows;
+    dataStore.webattacks = (data.weblog && data.weblog.rows) || [];
 
     document.getElementById('folderInfo').textContent =
       'Sysmon: ' + (data.sysmon.folder || 'none') +
@@ -486,6 +691,9 @@ async function loadLatest() {
     const incRes = await fetch('/api/incidents');
     const incData = await incRes.json();
     dataStore.incidents = incData.incidents || [];
+
+    const rulesRes = await fetch('/api/response-rules');
+    responseRules = await rulesRes.json();
 
     updateKpis();
     showTab(currentTab);
@@ -670,6 +878,71 @@ document.getElementById('autoHuntInterval').addEventListener('change', async fun
     // restart with new interval, same password won't be re-asked; simplest: stop and prompt again
     await fetch('/api/auto-hunt/stop', { method: 'POST' });
     openModal('auto');
+  }
+});
+
+function openRespondModal(incident, idx) {
+  const rule = responseRules[incident.pattern_id];
+  if (!rule) return;
+  pendingResponse = { incident: incident, idx: idx, rule: rule };
+
+  const actionLabel = rule.type === 'kill_process' ? 'kill the spawned process' : 'block the attacker\'s IP at OPNsense';
+  document.getElementById('respondTitle').textContent = 'Respond to: ' + incident.pattern_name;
+  document.getElementById('respondSubtitle').textContent =
+    'This will ' + actionLabel + ', for real, right now. This is not a drill — confirm you actually want this to execute.';
+  document.getElementById('respondError').textContent = '';
+  document.getElementById('respondPasswordInput').value = '';
+  document.getElementById('respondModal').style.display = 'flex';
+}
+
+document.getElementById('cancelRespondBtn').addEventListener('click', function() {
+  document.getElementById('respondModal').style.display = 'none';
+  pendingResponse = null;
+});
+
+document.getElementById('confirmRespondBtn').addEventListener('click', async function() {
+  if (!pendingResponse) return;
+  const { incident, idx, rule } = pendingResponse;
+  const password = document.getElementById('respondPasswordInput').value;
+  const errorEl = document.getElementById('respondError');
+
+  if (rule.type === 'kill_process' && !password) {
+    errorEl.textContent = 'VM password is required to kill a process.';
+    return;
+  }
+
+  if (!confirm('Are you absolutely sure? This action is live and cannot be automatically undone from this dashboard.')) {
+    return;
+  }
+
+  document.getElementById('confirmRespondBtn').disabled = true;
+  errorEl.textContent = '';
+
+  try {
+    const res = await fetch('/api/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pattern_id: incident.pattern_id,
+        incident: incident,
+        live: true,
+        password: password
+      })
+    });
+    const result = await res.json();
+    document.getElementById('confirmRespondBtn').disabled = false;
+    document.getElementById('respondModal').style.display = 'none';
+
+    const resultEl = document.getElementById('respondResult-' + idx);
+    if (resultEl) {
+      resultEl.style.display = 'block';
+      resultEl.className = 'respond-result ' + (result.success ? 'ok' : 'fail');
+      resultEl.textContent = (result.success ? '✓ Executed: ' : '✗ Failed: ') +
+        result.action + '(' + result.target + ') — ' + result.output;
+    }
+  } catch (err) {
+    document.getElementById('confirmRespondBtn').disabled = false;
+    errorEl.textContent = 'Request error: ' + err;
   }
 });
 
