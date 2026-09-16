@@ -15,4 +15,5 @@
 Thumbs.db
 
 # --- VS Code personal settings (optional) ---
-.vscode/
+.vscode/response/__pycache__/
+response/audit-log.jsonl

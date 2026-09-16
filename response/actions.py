@@ -23,6 +23,7 @@ can work live:
 """
 
 import subprocess
+import os
 import requests
 import urllib3
 
@@ -31,10 +32,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 VMRUN_PATH = r"C:\Program Files\VMware\VMware Workstation\vmrun.exe"
 VMX_PATH = r"C:\Users\Zirar\Documents\Virtual Machines\Victim-Win10-v2\Victim-Win10.vmx"
 
-# --- OPNsense API settings -- fill these in from your generated API key ---
+# --- OPNsense API settings ---
+# Never hardcode real values here -- this file is tracked in git. The key
+# and secret are read from environment variables instead, set once on your
+# machine (see docs/lab-setup.md for the exact command). If they're not set,
+# block_ip/unblock_ip will fail with a clear error rather than silently
+# using an empty credential.
 OPNSENSE_HOST = "https://192.168.20.1"
-OPNSENSE_API_KEY = "PASTE_YOUR_API_KEY_HERE"
-OPNSENSE_API_SECRET = "PASTE_YOUR_API_SECRET_HERE"
+OPNSENSE_API_KEY = os.environ.get("OPNSENSE_API_KEY", "")
+OPNSENSE_API_SECRET = os.environ.get("OPNSENSE_API_SECRET", "")
 OPNSENSE_ALIAS_NAME = "SOC_Blocked_IPs"
 
 
@@ -93,6 +99,10 @@ def block_ip(ip_address, guest_user, guest_password, dry_run=True):
 
     if dry_run:
         return True, f"[DRY RUN] Would POST to {url} with address={ip_address}"
+
+    if not OPNSENSE_API_KEY or not OPNSENSE_API_SECRET:
+        return False, ("OPNSENSE_API_KEY / OPNSENSE_API_SECRET environment variables are not set. "
+                        "See docs/lab-setup.md for how to set them.")
 
     try:
         resp = requests.post(
