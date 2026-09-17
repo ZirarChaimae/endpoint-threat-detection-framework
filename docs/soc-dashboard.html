@@ -227,6 +227,11 @@
   .respond-result { font-size: 12px; margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--panel-2); }
   .respond-result.ok { color: var(--low); }
   .respond-result.fail { color: var(--high); }
+  .incident-number {
+    display: inline-block; background: var(--panel-2); color: var(--muted);
+    font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 5px; margin-right: 6px;
+  }
+  .response-history { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
 
   .webattack-card {
     background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--accent);
@@ -546,7 +551,7 @@ const WEB_USE_CASE_PATTERNS = [
   'xss-alone'
 ];
 
-function buildIncidentCardHtml(inc, globalIdx) {
+function buildIncidentCardHtml(inc, globalIdx, displayNumber) {
   const mitreBadges = (inc.mitre_techniques || []).map(t =>
     '<span class="mitre-badge">' + t.id + ' — ' + t.tactic + '</span>'
   ).join('');
@@ -559,13 +564,25 @@ function buildIncidentCardHtml(inc, globalIdx) {
   let respondHtml = '';
   if (rule) {
     const actionLabel = rule.type === 'kill_process' ? 'Kill Process' : 'Block IP (via OPNsense)';
-    respondHtml = '<button class="respond-btn" data-incident-index="' + globalIdx + '">Respond — ' + actionLabel + '</button>' +
-      '<div class="respond-result" id="respondResult-' + globalIdx + '" style="display:none;"></div>';
+    respondHtml = '<button class="respond-btn" data-incident-index="' + globalIdx + '">Respond — ' + actionLabel + '</button>';
+  }
+
+  const history = inc.response_history || [];
+  let historyHtml = '';
+  if (history.length > 0) {
+    historyHtml = '<div class="response-history">' + history.map(h => {
+      const mode = h.dry_run ? 'DRY RUN' : 'LIVE';
+      const cls = h.success ? 'ok' : 'fail';
+      const icon = h.success ? '✓' : '✗';
+      const when = (h.executed_at || '').replace('T', ' ').split('.')[0];
+      return '<div class="respond-result ' + cls + '">' + icon + ' [' + mode + '] ' + when + ' — ' +
+             h.action + '(' + h.target + ') — ' + (h.output || '') + '</div>';
+    }).join('') + '</div>';
   }
 
   return (
     '<div class="incident-header">' +
-      '<div class="incident-title">' + inc.pattern_name + '</div>' +
+      '<div class="incident-title">' + (displayNumber ? '<span class="incident-number">#' + displayNumber + '</span> ' : '') + inc.pattern_name + '</div>' +
       '<span class="badge badge-' + inc.severity + '">' + inc.severity.toUpperCase() + '</span>' +
     '</div>' +
     '<div class="incident-desc">' + inc.description + '</div>' +
@@ -573,7 +590,8 @@ function buildIncidentCardHtml(inc, globalIdx) {
     '<div>' + mitreBadges + '</div>' +
     '<div class="timeline-label">Timeline (' + inc.stage_count + ' stages)</div>' +
     '<ul class="timeline-list">' + stagesList + '</ul>' +
-    '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">' +
+    historyHtml +
+    '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">' +
       respondHtml +
       '<button class="report-btn" data-incident-index="' + globalIdx + '">Download Report</button>' +
     '</div>'
@@ -624,11 +642,11 @@ function renderIncidentList(containerId, incidentsList) {
     return;
   }
 
-  incidentsList.forEach(inc => {
+  incidentsList.forEach((inc, i) => {
     const card = document.createElement('div');
     card.className = 'incident-card sev-' + inc.severity;
     const globalIdx = dataStore.incidents.indexOf(inc);
-    card.innerHTML = buildIncidentCardHtml(inc, globalIdx);
+    card.innerHTML = buildIncidentCardHtml(inc, globalIdx, i + 1);
     container.appendChild(card);
   });
 
@@ -691,6 +709,7 @@ async function loadLatest() {
     const incRes = await fetch('/api/incidents');
     const incData = await incRes.json();
     dataStore.incidents = incData.incidents || [];
+    dataStore.incidents.sort((a, b) => (b.start_time || '').localeCompare(a.start_time || ''));
 
     const rulesRes = await fetch('/api/response-rules');
     responseRules = await rulesRes.json();
@@ -933,13 +952,15 @@ document.getElementById('confirmRespondBtn').addEventListener('click', async fun
     document.getElementById('confirmRespondBtn').disabled = false;
     document.getElementById('respondModal').style.display = 'none';
 
-    const resultEl = document.getElementById('respondResult-' + idx);
-    if (resultEl) {
-      resultEl.style.display = 'block';
-      resultEl.className = 'respond-result ' + (result.success ? 'ok' : 'fail');
-      resultEl.textContent = (result.success ? '✓ Executed: ' : '✗ Failed: ') +
-        result.action + '(' + result.target + ') — ' + result.output;
+    if (result.error) {
+      document.getElementById('status').textContent = 'Response failed: ' + result.error;
     }
+
+    // The result is now persisted server-side (response-log.json), keyed to
+    // this incident -- reload from the server so it shows up as part of the
+    // incident's real history, surviving future refreshes, rather than
+    // writing into a DOM element that the next auto-refresh would wipe out.
+    await loadLatest();
   } catch (err) {
     document.getElementById('confirmRespondBtn').disabled = false;
     errorEl.textContent = 'Request error: ' + err;
