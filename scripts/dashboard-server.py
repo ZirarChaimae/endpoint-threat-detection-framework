@@ -310,6 +310,32 @@ def run_pipeline(password):
     if result.returncode != 0:
         return {"success": False, "auth_error": False, "error": combined_output[-800:] or "Unknown error"}
 
+    # Pull the Apache access log and run the web-attack detector, same way
+    # the endpoint side already pulls Sysmon/Security logs. This was
+    # previously a manual step done by hand every time -- now it's part of
+    # the same "Run Hunt" action. A failure here should never fail the whole
+    # hunt (the endpoint side already succeeded), so every step is wrapped.
+    try:
+        webattack_dir = REPO_ROOT / "webattack"
+        webattack_dir.mkdir(exist_ok=True)
+        access_log_dest = webattack_dir / "access.log"
+        subprocess.run(
+            [
+                VMRUN_PATH, "-T", "ws", "-gu", "soc", "-gp", password,
+                "copyFileFromGuestToHost", VMX_PATH,
+                r"C:\xampp\apache\logs\access.log", str(access_log_dest)
+            ],
+            capture_output=True, text=True, timeout=60
+        )
+        if access_log_dest.exists():
+            subprocess.run(
+                ["python", str(REPO_ROOT / "webattack" / "weblog_detector.py"),
+                 "--log", str(access_log_dest), "--computer", "DESKTOP-JC89B03"],
+                capture_output=True, text=True, timeout=60
+            )
+    except Exception:
+        pass  # web-attack detection is a best-effort addition, never blocks the core hunt
+
     try:
         subprocess.run(["python", str(CORRELATE_SCRIPT)], capture_output=True, text=True, timeout=60)
     except Exception:
