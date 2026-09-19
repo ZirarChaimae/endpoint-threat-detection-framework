@@ -1,0 +1,1347 @@
+[
+  {
+    "pattern_id": "full-intrusion-chain",
+    "pattern_name": "Full Intrusion Chain (Recon to Execution to Persistence)",
+    "description": "A broader four-stage progression: host fingerprinting and process enumeration, followed by encoded PowerShell execution and registry-based persistence.",
+    "start_time": "2026-09-02T13:20:42.875608+00:00",
+    "end_time": "2026-09-02T13:21:36.671838+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 4,
+    "mitre_techniques": [
+      {
+        "id": "T1082",
+        "tactic": "Discovery"
+      },
+      {
+        "id": "T1057",
+        "tactic": "Discovery"
+      },
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-02T13:20:42.875608+00:00",
+        "detection": "System Information Discovery via systeminfo.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "3960",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-02T13:20:52.798614+00:00",
+        "detection": "Process Discovery via tasklist.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "10360",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-02T13:21:11.897481+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "3476",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-02T13:21:36.671838+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "8228",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-08-26T05:30:55.774300+00:00",
+    "end_time": "2026-08-26T05:38:44.259697+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-08-26T05:30:55.774300+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "9828",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-08-26T05:38:44.259697+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "10368",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-08-26T05:38:32.191642+00:00",
+    "end_time": "2026-08-26T05:39:36.755315+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-08-26T05:38:32.191642+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "11084",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-08-26T05:39:36.755315+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "4040",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-08-27T03:23:48.607822+00:00",
+    "end_time": "2026-08-27T03:24:02.901165+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-08-27T03:23:48.607822+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "7628",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-08-27T03:24:02.901165+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "7384",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-09-17T18:34:32.781754+00:00",
+    "end_time": "2026-09-17T18:35:21.403547+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T18:34:32.781754+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "5344",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-17T18:35:21.403547+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "3892",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-09-17T18:42:48.393484+00:00",
+    "end_time": "2026-09-17T18:44:28.192656+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T18:42:48.393484+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "6692",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-17T18:44:28.192656+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "4400",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-09-17T19:06:12.126437+00:00",
+    "end_time": "2026-09-17T19:11:12.791548+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T19:06:12.126437+00:00",
+        "detection": "Non Interactive PowerShell Process Spawned;Suspicious Encoded PowerShell Command Line;Suspicious Execution of Powershell with Base64",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "6436",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-17T19:11:12.791548+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "8768",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-09-17T19:06:12.126437+00:00",
+    "end_time": "2026-09-17T19:14:09.460223+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T19:06:12.126437+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "6436",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-17T19:14:09.460223+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "9212",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-09-17T19:24:15.251352+00:00",
+    "end_time": "2026-09-17T19:24:46.738981+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T19:24:15.251352+00:00",
+        "detection": "Non Interactive PowerShell Process Spawned;Suspicious Encoded PowerShell Command Line;Suspicious Execution of Powershell with Base64",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "1864",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-17T19:24:46.738981+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "1328",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "phishing-to-persistence",
+    "pattern_name": "Phishing/PowerShell to Registry Persistence",
+    "description": "Initial execution via encoded PowerShell followed by registry-based persistence, consistent with a phishing payload establishing a foothold.",
+    "start_time": "2026-09-17T22:07:51.012832+00:00",
+    "end_time": "2026-09-17T22:08:15.698046+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1547.001",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T22:07:51.012832+00:00",
+        "detection": "Non Interactive PowerShell Process Spawned;Suspicious Encoded PowerShell Command Line;Suspicious Execution of Powershell with Base64",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "8932",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-17T22:08:15.698046+00:00",
+        "detection": "Registry Run Key Persistence via reg.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "4792",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "compromise-to-staging",
+    "pattern_name": "Compromise to Scheduled Task to Command Execution to Data Staging",
+    "description": "Persistence established via scheduled task, followed by command execution and preparation of data for exfiltration.",
+    "start_time": "2026-09-02T13:23:41.392358+00:00",
+    "end_time": "2026-09-02T13:23:50.180931+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "medium",
+    "confidence": "medium",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1053.005",
+        "tactic": "Persistence"
+      },
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-02T13:23:41.392358+00:00",
+        "detection": "Scheduled Task Creation Via Schtasks.EXE;Suspicious Schtasks Schedule Types;Windows Shell/Scripting Processes Spawning Suspicious Programs",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "436",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-02T13:23:50.180931+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "7924",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "evasion-preparation",
+    "pattern_name": "Evasion Preparation (Hidden Extensions to Encoded Execution)",
+    "description": "File-extension hiding followed by an encoded PowerShell execution, consistent with an attacker preparing a disguised payload before running it.",
+    "start_time": "2026-08-19T22:42:25.354993+00:00",
+    "end_time": "2026-08-19T22:42:59.642620+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "medium",
+    "confidence": "medium",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1112",
+        "tactic": "Defense Evasion"
+      },
+      {
+        "id": "T1059.001",
+        "tactic": "Execution"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-08-19T22:42:25.354993+00:00",
+        "detection": "File Extensions Hidden via Registry Modification",
+        "event_id": "13",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "6724",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-08-19T22:42:59.642620+00:00",
+        "detection": "Suspicious Encoded PowerShell Command",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "7032",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "discovery-before-scheduled-persistence",
+    "pattern_name": "Discovery to Scheduled Task Persistence",
+    "description": "Process enumeration (possibly checking for security tools) followed by scheduled-task persistence.",
+    "start_time": "2026-09-03T08:23:02.839148+00:00",
+    "end_time": "2026-09-03T08:23:09.887950+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "DESKTOP-JC89B03\\soc"
+    ],
+    "severity": "medium",
+    "confidence": "medium",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1057",
+        "tactic": "Discovery"
+      },
+      {
+        "id": "T1053.005",
+        "tactic": "Persistence"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-03T08:23:02.839148+00:00",
+        "detection": "Process Discovery via tasklist.exe",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "9436",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      },
+      {
+        "timestamp": "2026-09-03T08:23:09.887950+00:00",
+        "detection": "Scheduled Task Creation Via Schtasks.EXE;Suspicious Schtasks Schedule Types;Windows Shell/Scripting Processes Spawning Suspicious Programs",
+        "event_id": "1",
+        "user": "DESKTOP-JC89B03\\soc",
+        "process_id": "4724",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "command-injection-web-to-endpoint",
+    "pattern_name": "Command Injection: Web Request to Spawned Process",
+    "description": "A request to a known command-injection-vulnerable web endpoint, immediately followed by the web server process spawning a shell or system utility on the same host -- the web-log and endpoint evidence for the same real intrusion, correlated together.",
+    "start_time": "2026-09-15T21:09:01+01:00",
+    "end_time": "2026-09-15T20:10:57.826699+00:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1",
+      "NT AUTHORITY\\SYSTEM"
+    ],
+    "severity": "high",
+    "confidence": "high",
+    "stage_count": 2,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      },
+      {
+        "id": "T1059",
+        "tactic": "Execution"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T21:09:01+01:00",
+        "detection": "Command Injection Attempt (endpoint-based, payload not visible in GET/POST log)",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/exec/?ip=127.0.0.1;whoami&Submit=Submit"
+      },
+      {
+        "timestamp": "2026-09-15T20:10:57.826699+00:00",
+        "detection": "Suspicious Child Process Spawned by Web Server",
+        "event_id": "1",
+        "user": "NT AUTHORITY\\SYSTEM",
+        "process_id": "10132",
+        "source_ip": null,
+        "http_method": null,
+        "http_path": null
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-15T20:11:20+01:00",
+    "end_time": "2026-09-15T20:11:20+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T20:11:20+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-15T21:08:54+01:00",
+    "end_time": "2026-09-15T21:08:54+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T21:08:54+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:05:03+01:00",
+    "end_time": "2026-09-17T15:05:03+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:05:03+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:07:45+01:00",
+    "end_time": "2026-09-17T15:07:45+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:07:45+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:16:47+01:00",
+    "end_time": "2026-09-17T15:16:47+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:16:47+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:16:47+01:00",
+    "end_time": "2026-09-17T15:16:47+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:16:47+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:16:47+01:00",
+    "end_time": "2026-09-17T15:16:47+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:16:47+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:16:55+01:00",
+    "end_time": "2026-09-17T15:16:55+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:16:55+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:17:04+01:00",
+    "end_time": "2026-09-17T15:17:04+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:17:04+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T15:44:16+01:00",
+    "end_time": "2026-09-17T15:44:16+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T15:44:16+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T16:11:00+01:00",
+    "end_time": "2026-09-17T16:11:00+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T16:11:00+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T16:24:07+01:00",
+    "end_time": "2026-09-17T16:24:07+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T16:24:07+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T16:44:20+01:00",
+    "end_time": "2026-09-17T16:44:20+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T16:44:20+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T16:55:26+01:00",
+    "end_time": "2026-09-17T16:55:26+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T16:55:26+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-17T18:15:05+01:00",
+    "end_time": "2026-09-17T18:15:05+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-17T18:15:05+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "sql-injection-alone",
+    "pattern_name": "SQL Injection (Web Application)",
+    "description": "A request matching known SQL Injection syntax against a web application endpoint.",
+    "start_time": "2026-09-19T03:18:38+01:00",
+    "end_time": "2026-09-19T03:18:38+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.250.134"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-19T03:18:38+01:00",
+        "detection": "SQL Injection Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.250.134",
+        "process_id": null,
+        "source_ip": "192.168.250.134",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit"
+      }
+    ]
+  },
+  {
+    "pattern_id": "path-traversal-alone",
+    "pattern_name": "Path Traversal / Local File Inclusion (Web Application)",
+    "description": "A request attempting to read files outside the web application's intended directory.",
+    "start_time": "2026-09-15T20:09:45+01:00",
+    "end_time": "2026-09-15T20:09:45+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T20:09:45+01:00",
+        "detection": "Path Traversal Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/fi/?page=../../../../etc/passwd"
+      }
+    ]
+  },
+  {
+    "pattern_id": "path-traversal-alone",
+    "pattern_name": "Path Traversal / Local File Inclusion (Web Application)",
+    "description": "A request attempting to read files outside the web application's intended directory.",
+    "start_time": "2026-09-15T21:06:17+01:00",
+    "end_time": "2026-09-15T21:06:17+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T21:06:17+01:00",
+        "detection": "Path Traversal Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/fi/?page=../../../../etc/passwd"
+      }
+    ]
+  },
+  {
+    "pattern_id": "path-traversal-alone",
+    "pattern_name": "Path Traversal / Local File Inclusion (Web Application)",
+    "description": "A request attempting to read files outside the web application's intended directory.",
+    "start_time": "2026-09-15T21:07:54+01:00",
+    "end_time": "2026-09-15T21:07:54+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "high",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T21:07:54+01:00",
+        "detection": "Path Traversal Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/fi/?page=C%3a%2fwindows%2fwin.ini"
+      }
+    ]
+  },
+  {
+    "pattern_id": "xss-alone",
+    "pattern_name": "Cross-Site Scripting (Web Application)",
+    "description": "A request containing an unescaped script or event-handler payload reflected by the web application.",
+    "start_time": "2026-09-15T20:10:02+01:00",
+    "end_time": "2026-09-15T20:10:02+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "medium",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T20:10:02+01:00",
+        "detection": "Cross-Site Scripting (XSS) Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/xss_r/?name=<script>alert(1)</script>"
+      }
+    ]
+  },
+  {
+    "pattern_id": "xss-alone",
+    "pattern_name": "Cross-Site Scripting (Web Application)",
+    "description": "A request containing an unescaped script or event-handler payload reflected by the web application.",
+    "start_time": "2026-09-15T21:08:42+01:00",
+    "end_time": "2026-09-15T21:08:42+01:00",
+    "computer": "DESKTOP-JC89B03",
+    "users": [
+      "192.168.20.1"
+    ],
+    "severity": "medium",
+    "confidence": "medium",
+    "stage_count": 1,
+    "mitre_techniques": [
+      {
+        "id": "T1190",
+        "tactic": "Initial Access"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-09-15T21:08:42+01:00",
+        "detection": "Cross-Site Scripting (XSS) Attempt",
+        "event_id": "HTTP",
+        "user": "192.168.20.1",
+        "process_id": null,
+        "source_ip": "192.168.20.1",
+        "http_method": "GET",
+        "http_path": "/DVWA/vulnerabilities/xss_r/?name=<script>alert(1)</script>"
+      }
+    ]
+  }
+]

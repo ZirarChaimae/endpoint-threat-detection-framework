@@ -1,0 +1,42 @@
+[
+  {
+    "success": true,
+    "action": "kill_process",
+    "target": "8932",
+    "dry_run": false,
+    "verified": true,
+    "output": "",
+    "incident_key": "phishing-to-persistence|2026-09-17T22:07:51.012832+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-17T23:10:33.957913"
+  },
+  {
+    "success": false,
+    "action": "block_ip",
+    "target": "192.168.250.134",
+    "dry_run": false,
+    "verified": false,
+    "output": "{'status': 401, 'message': 'Authentication Failed'}",
+    "incident_key": "sql-injection-alone|2026-09-19T03:18:38+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-19T03:23:44.120693"
+  },
+  {
+    "success": true,
+    "action": "block_ip",
+    "target": "192.168.250.134",
+    "dry_run": false,
+    "verified": true,
+    "output": "{'status': 'done'}",
+    "incident_key": "sql-injection-alone|2026-09-19T03:18:38+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-19T03:39:01.521766"
+  },
+  {
+    "success": true,
+    "action": "block_ip",
+    "target": "192.168.20.1",
+    "dry_run": false,
+    "verified": true,
+    "output": "{'status': 'done'}",
+    "incident_key": "sql-injection-alone|2026-09-17T18:15:05+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-19T03:40:06.891864"
+  }
+]
