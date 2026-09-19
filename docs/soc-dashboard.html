@@ -667,6 +667,18 @@ function attachIncidentCardHandlers(container) {
         const result = await res.json();
         if (!result.success) {
           alert('Unblock failed: ' + formatResponseOutput(result.output) + (result.error ? (' ' + result.error) : ''));
+        } else {
+          // Brief, self-dismissing confirmation -- doesn't need to persist
+          // anywhere (no history entry, no incident-card clutter), just
+          // enough to confirm the click actually did something before it
+          // fades on its own.
+          const statusEl = document.getElementById('status');
+          statusEl.textContent = 'IP ' + ip + ' unblocked successfully.';
+          statusEl.style.color = 'var(--low)';
+          setTimeout(function() {
+            statusEl.textContent = '';
+            statusEl.style.color = '';
+          }, 4000);
         }
         await loadLatest();
       } catch (err) {
@@ -1025,6 +1037,14 @@ document.getElementById('confirmRespondBtn').addEventListener('click', async fun
 
     if (result.error) {
       document.getElementById('status').textContent = 'Response failed: ' + result.error;
+    } else if (result.success === false) {
+      // A structured failure (e.g. an OPNsense auth error) doesn't set
+      // result.error -- it's a normal-shaped response with success:false.
+      // Persisted history intentionally hides failed attempts on the card
+      // (per request), so without this the analyst would see nothing at
+      // all happen. Surface it once, immediately, as an alert -- it just
+      // won't linger on the incident card afterward.
+      alert('Response action failed:\n' + formatResponseOutput(result.output));
     }
 
     // The result is now persisted server-side (response-log.json), keyed to
