@@ -38,7 +38,7 @@ VMX_PATH = r"C:\Users\Zirar\Documents\Virtual Machines\Victim-Win10-v2\Victim-Wi
 # machine (see docs/lab-setup.md for the exact command). If they're not set,
 # block_ip/unblock_ip will fail with a clear error rather than silently
 # using an empty credential.
-OPNSENSE_HOST = "https://192.168.20.1"
+OPNSENSE_HOST = "http://192.168.20.128"
 OPNSENSE_API_KEY = os.environ.get("OPNSENSE_API_KEY", "")
 OPNSENSE_API_SECRET = os.environ.get("OPNSENSE_API_SECRET", "")
 OPNSENSE_ALIAS_NAME = "SOC_Blocked_IPs"
