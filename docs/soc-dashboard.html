@@ -604,8 +604,11 @@ function buildIncidentCardHtml(inc, globalIdx, displayNumber) {
   // Only successful actions are shown on the card -- failed attempts (e.g. an
   // auth error from a stale API key) stay in response-log.json for the audit
   // trail, but clutter the live incident view without adding useful signal.
+  // Only the single most recent success is shown, not every past attempt --
+  // the log already lists newest-first, so index 0 is the one that matters.
   const allHistory = inc.response_history || [];
-  const successfulHistory = allHistory.filter(h => h.success);
+  const latestSuccess = allHistory.find(h => h.success);
+  const successfulHistory = latestSuccess ? [latestSuccess] : [];
 
   let historyHtml = '';
   if (successfulHistory.length > 0) {
@@ -665,22 +668,12 @@ function attachIncidentCardHandlers(container) {
           body: JSON.stringify({ ip: ip, live: true })
         });
         const result = await res.json();
+        await loadLatest();
         if (!result.success) {
           alert('Unblock failed: ' + formatResponseOutput(result.output) + (result.error ? (' ' + result.error) : ''));
         } else {
-          // Brief, self-dismissing confirmation -- doesn't need to persist
-          // anywhere (no history entry, no incident-card clutter), just
-          // enough to confirm the click actually did something before it
-          // fades on its own.
-          const statusEl = document.getElementById('status');
-          statusEl.textContent = 'IP ' + ip + ' unblocked successfully.';
-          statusEl.style.color = 'var(--low)';
-          setTimeout(function() {
-            statusEl.textContent = '';
-            statusEl.style.color = '';
-          }, 4000);
+          alert('IP ' + ip + ' unblocked successfully.');
         }
-        await loadLatest();
       } catch (err) {
         alert('Unblock request error: ' + err);
       } finally {
