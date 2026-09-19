@@ -224,6 +224,10 @@
     margin-top: 10px; background: rgba(76,141,255,0.12); color: var(--accent); border-color: var(--accent);
   }
   .report-btn:hover { background: var(--accent); color: #fff; }
+  .unblock-btn {
+    margin-top: 10px; background: rgba(53,192,122,0.12); color: var(--low); border-color: var(--low);
+  }
+  .unblock-btn:hover { background: var(--low); color: #fff; }
   .respond-result { font-size: 12px; margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--panel-2); }
   .respond-result.ok { color: var(--low); }
   .respond-result.fail { color: var(--high); }
@@ -551,6 +555,36 @@ const WEB_USE_CASE_PATTERNS = [
   'xss-alone'
 ];
 
+function formatResponseOutput(raw) {
+  // actions.py currently returns Python-dict-repr strings (single-quoted,
+  // e.g. "{'status': 'done'}" or "{'status': 401, 'message': 'Authentication Failed'}").
+  // This is not valid JSON, so JSON.parse would throw -- extract key/value
+  // pairs with a regex instead and render them as plain, readable text.
+  if (!raw) return '';
+  const pairs = {};
+  const regex = /'(\w+)':\s*(?:'([^']*)'|(-?\d+(?:\.\d+)?)|(True|False|None))/g;
+  let match;
+  let matchedAny = false;
+  while ((match = regex.exec(raw)) !== null) {
+    matchedAny = true;
+    const key = match[1];
+    const value = match[2] !== undefined ? match[2] : (match[3] !== undefined ? match[3] : match[4]);
+    pairs[key] = value;
+  }
+  if (!matchedAny) {
+    return raw; // not a dict-like string (e.g. already plain text) -- show as-is
+  }
+  const parts = [];
+  if (pairs.status !== undefined) parts.push('Status: ' + pairs.status);
+  if (pairs.message !== undefined) parts.push(pairs.message);
+  Object.keys(pairs).forEach(function(k) {
+    if (k !== 'status' && k !== 'message') {
+      parts.push(k.charAt(0).toUpperCase() + k.slice(1) + ': ' + pairs[k]);
+    }
+  });
+  return parts.join(' — ');
+}
+
 function buildIncidentCardHtml(inc, globalIdx, displayNumber) {
   const mitreBadges = (inc.mitre_techniques || []).map(t =>
     '<span class="mitre-badge">' + t.id + ' — ' + t.tactic + '</span>'
@@ -567,17 +601,30 @@ function buildIncidentCardHtml(inc, globalIdx, displayNumber) {
     respondHtml = '<button class="respond-btn" data-incident-index="' + globalIdx + '">Respond — ' + actionLabel + '</button>';
   }
 
-  const history = inc.response_history || [];
+  // Only successful actions are shown on the card -- failed attempts (e.g. an
+  // auth error from a stale API key) stay in response-log.json for the audit
+  // trail, but clutter the live incident view without adding useful signal.
+  const allHistory = inc.response_history || [];
+  const successfulHistory = allHistory.filter(h => h.success);
+
   let historyHtml = '';
-  if (history.length > 0) {
-    historyHtml = '<div class="response-history">' + history.map(h => {
+  if (successfulHistory.length > 0) {
+    historyHtml = '<div class="response-history">' + successfulHistory.map(h => {
       const mode = h.dry_run ? 'DRY RUN' : 'LIVE';
-      const cls = h.success ? 'ok' : 'fail';
-      const icon = h.success ? '✓' : '✗';
       const when = (h.executed_at || '').replace('T', ' ').split('.')[0];
-      return '<div class="respond-result ' + cls + '">' + icon + ' [' + mode + '] ' + when + ' — ' +
-             h.action + '(' + h.target + ') — ' + (h.output || '') + '</div>';
+      return '<div class="respond-result ok">✓ [' + mode + '] ' + when + ' — ' +
+             h.action + '(' + h.target + ') — ' + formatResponseOutput(h.output) + '</div>';
     }).join('') + '</div>';
+  }
+
+  // An "Unblock IP" button appears once a block_ip action has actually
+  // succeeded, using that action's own recorded target -- this lets the
+  // analyst (or a repeated demo run) reverse the block without needing the
+  // OPNsense GUI or a raw curl call to the API.
+  const successfulBlock = successfulHistory.find(h => h.action === 'block_ip');
+  let unblockHtml = '';
+  if (successfulBlock) {
+    unblockHtml = '<button class="unblock-btn" data-unblock-ip="' + successfulBlock.target + '" data-incident-index="' + globalIdx + '">Unblock IP</button>';
   }
 
   return (
@@ -593,6 +640,7 @@ function buildIncidentCardHtml(inc, globalIdx, displayNumber) {
     historyHtml +
     '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">' +
       respondHtml +
+      unblockHtml +
       '<button class="report-btn" data-incident-index="' + globalIdx + '">Download Report</button>' +
     '</div>'
   );
@@ -603,6 +651,29 @@ function attachIncidentCardHandlers(container) {
     btn.addEventListener('click', function() {
       const idx = parseInt(btn.dataset.incidentIndex, 10);
       openRespondModal(dataStore.incidents[idx], idx);
+    });
+  });
+  container.querySelectorAll('.unblock-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const ip = btn.dataset.unblockIp;
+      if (!confirm('Unblock ' + ip + '? This restores network access for this address.')) return;
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/unblock-ip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip: ip, live: true })
+        });
+        const result = await res.json();
+        if (!result.success) {
+          alert('Unblock failed: ' + formatResponseOutput(result.output) + (result.error ? (' ' + result.error) : ''));
+        }
+        await loadLatest();
+      } catch (err) {
+        alert('Unblock request error: ' + err);
+      } finally {
+        btn.disabled = false;
+      }
     });
   });
   container.querySelectorAll('.report-btn').forEach(function(btn) {
