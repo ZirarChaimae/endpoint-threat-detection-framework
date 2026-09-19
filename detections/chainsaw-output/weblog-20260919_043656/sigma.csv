@@ -1,0 +1,157 @@
+timestamp,detections,path,count,Event.System.Provider,Event ID,Record ID,Computer,Event Data
+2026-09-15T20:09:15+01:00,"Command Injection Attempt (endpoint-based, payload not visible in GET/POST log)",apache/access.log,1,Apache-WebLog,HTTP,193,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: POST
+HttpPath: /DVWA/vulnerabilities/exec/
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-15T20:09:45+01:00,Path Traversal Attempt,apache/access.log,1,Apache-WebLog,HTTP,194,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/fi/?page=../../../../etc/passwd
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-15T20:10:02+01:00,Cross-Site Scripting (XSS) Attempt,apache/access.log,1,Apache-WebLog,HTTP,195,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/xss_r/?name=<script>alert(1)</script>
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-15T20:11:20+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,196,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-15T21:06:17+01:00,Path Traversal Attempt,apache/access.log,1,Apache-WebLog,HTTP,203,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/fi/?page=../../../../etc/passwd
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-15T21:07:54+01:00,Path Traversal Attempt,apache/access.log,1,Apache-WebLog,HTTP,204,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/fi/?page=C%3a%2fwindows%2fwin.ini
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-15T21:08:42+01:00,Cross-Site Scripting (XSS) Attempt,apache/access.log,1,Apache-WebLog,HTTP,205,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/xss_r/?name=<script>alert(1)</script>
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-15T21:08:54+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,206,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-15T21:09:01+01:00,"Command Injection Attempt (endpoint-based, payload not visible in GET/POST log)",apache/access.log,1,Apache-WebLog,HTTP,207,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/exec/?ip=127.0.0.1;whoami&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-15T21:10:57+01:00,"Command Injection Attempt (endpoint-based, payload not visible in GET/POST log)",apache/access.log,1,Apache-WebLog,HTTP,208,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: POST
+HttpPath: /DVWA/vulnerabilities/exec/
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-17T15:05:03+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,210,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:07:45+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,211,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:16:47+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,212,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:16:47+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,214,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:16:47+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,215,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:16:55+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,217,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:17:04+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,218,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T15:44:16+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,219,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T16:11:00+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,223,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T16:24:07+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,228,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 302
+UserAgent: curl/8.20.0"
+2026-09-17T16:44:20+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,232,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-17T16:55:26+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,233,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-17T18:15:05+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,240,DESKTOP-JC89B03,"SourceIp: 192.168.20.1
+User: 192.168.20.1
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-19T03:18:38+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,287,DESKTOP-JC89B03,"SourceIp: 192.168.250.134
+User: 192.168.250.134
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-19T04:24:33+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,289,DESKTOP-JC89B03,"SourceIp: 192.168.250.134
+User: 192.168.250.134
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
+2026-09-19T04:36:01+01:00,SQL Injection Attempt,apache/access.log,1,Apache-WebLog,HTTP,292,DESKTOP-JC89B03,"SourceIp: 192.168.250.134
+User: 192.168.250.134
+HttpMethod: GET
+HttpPath: /DVWA/vulnerabilities/sqli/?id=1%27+OR+%271%27%3d%271&Submit=Submit
+HttpStatus: 200
+UserAgent: curl/8.20.0"
