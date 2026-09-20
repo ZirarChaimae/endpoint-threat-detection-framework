@@ -172,12 +172,18 @@ These are hard-won operational details that are easy to silently break and hard 
 
 - **DVWA's login session and security level (must be "Low") reset after MySQL restarts or VM reboots.** Always re-authenticate and re-verify the security level before assuming an attack "isn't working" (see `webattack/scenario-playbook.md` for the exact re-authentication commands).
 
+- **Apache occasionally logs the wrong source IP** (192.168.20.1, the host's own address) instead of the real attacker's, for some requests. Confirmed via `tcpdump` that the correct address is genuinely on the wire — root cause not found (ruled out `mod_remoteip`, custom `LogFormat`, and NAT translation). Cosmetic; does not affect detection or correlation logic, only which address a response action would target for that specific mis-logged event. Always cross-check the incident's displayed source IP against the attacker's actual current address before triggering `block_ip`.
 
 - **Windows Smart App Control blocks Chainsaw entirely on the host** — this is why Chainsaw runs inside the VM via `vmrun runProgramInGuest` rather than on the host machine directly; no exclusion or unblock workaround succeeded.
 
 - **Only 15.3GB RAM on the host.** Running all three VMs plus normal desktop applications can push free RAM below 1GB, causing intermittent, misleading network symptoms that look like configuration bugs. Check free RAM before any multi-VM debugging session:
   ```powershell
   Get-CimInstance Win32_OperatingSystem | Select-Object @{N="FreeRAM(GB)";E={[math]::Round($_.FreePhysicalMemory/1MB,1)}}
+  ```
+
+- **The host and Windows-DVWA can silently drift exactly one hour apart.** Confirmed on 2026-09-20: `Get-Date` on the host returned `20:52:26` while the same command on Windows-DVWA returned `21:52:26` at the same real moment — a clean 1:00:00 gap, most likely caused by Morocco's DST transition landing on one machine's clock and not the other's. This is not cosmetic — it directly corrupted an early attempt to measure detection speed (MTTD), since comparing a VM-timestamped attack log against a host-timestamped incident file without correcting for the skew made a genuinely fast detection look like it happened *before* the attack it was detecting. **Before any timing-sensitive test, check both clocks:**
+  ```powershell
+  Get-Date   # run on both the host and Windows-DVWA, compare directly
   ```
 
 ---
