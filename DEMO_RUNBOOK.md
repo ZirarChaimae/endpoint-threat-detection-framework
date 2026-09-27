@@ -42,7 +42,7 @@ restarts or VM reboots — see Step 2 below to reset it if needed).
 the dashboard is started **from a PowerShell window that has the env vars
 above set**:
 ```powershell
-cd "C:\Users\Zirar\Documents\endpoint-threat-detection-framework"
+"C:\Users\Zirar\Documents\endpoint-threat-detection-framework"
 python scripts\dashboard-server.py
 ```
 Open `http://127.0.0.1:5000` and confirm the dashboard loads.

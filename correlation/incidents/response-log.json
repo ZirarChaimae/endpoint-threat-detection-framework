@@ -128,5 +128,195 @@
     "output": "{'status': 'done'}",
     "incident_key": "sql-injection-alone|2026-09-19T04:36:01+01:00|DESKTOP-JC89B03",
     "executed_at": "2026-09-19T05:02:47.617268"
+  },
+  {
+    "success": true,
+    "action": "block_ip",
+    "target": "192.168.250.134",
+    "dry_run": false,
+    "verified": true,
+    "output": "{'status': 'done'}",
+    "incident_key": "xss-alone|2026-09-22T00:42:08+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-21T23:44:14.032041"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "9776",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "command-injection-web-to-endpoint|2026-09-22T00:42:18+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-21T23:51:16.377256"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "9776",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "command-injection-web-to-endpoint|2026-09-22T00:42:18+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-21T23:51:40.932552"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "9776",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "command-injection-web-to-endpoint|2026-09-22T00:42:18+01:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-21T23:54:21.126317"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "4248",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:21:39.666049+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:25:02.018808"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "4248",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:21:39.666049+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:25:41.201770"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "8964",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:22:54.824530+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:32:14.910397"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "8964",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:22:54.824530+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:32:30.481320"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "4248",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:21:39.666049+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:32:45.539199"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "4248",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:21:39.666049+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:32:59.870351"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "7796",
+    "dry_run": false,
+    "verified": false,
+    "output": "Error: Invalid user name or password for the guest OS",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:29:06.263840+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:40:13.170865"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "7796",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:29:06.263840+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:40:31.144821"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "7772",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:37:40.617706+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:44:58.778896"
+  },
+  {
+    "success": true,
+    "action": "kill_process",
+    "target": "9208",
+    "dry_run": false,
+    "verified": true,
+    "output": "",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:48:39.533917+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T00:52:06.543386"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "11160",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:54:11.348301+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T01:01:47.865554"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "11160",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:54:11.348301+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T01:02:07.773640"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "11160",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:54:11.348301+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T01:03:47.166721"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "11160",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:54:11.348301+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T01:15:04.474188"
+  },
+  {
+    "success": false,
+    "action": "kill_process",
+    "target": "11160",
+    "dry_run": false,
+    "verified": true,
+    "output": "Guest program exited with non-zero exit code: 128",
+    "incident_key": "phishing-to-persistence|2026-09-22T00:54:11.348301+00:00|DESKTOP-JC89B03",
+    "executed_at": "2026-09-22T13:14:12.962366"
   }
 ]

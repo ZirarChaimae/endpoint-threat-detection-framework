@@ -90,7 +90,7 @@
 - Security level must be "Low" for the scripted attacks to succeed -- **resets to a stricter level after a MySQL restart or VM reboot**; always re-verify before assuming an attack "isn't working." Exact authenticated re-login and security-level-reset commands are in `webattack/scenario-playbook.md`.
 
 ### Wazuh (benchmark comparison target)
-- Wazuh manager VM: Ubuntu, dual-homed -- one NIC on VMnet8 (NAT, for the manager's own internet access/updates), a second NIC added specifically on VMnet4 so the manager is directly reachable from Victim-Win10 without routing through OPNsense (no security reason for the monitoring platform itself to sit behind the firewall being tested).
+- Wazuh manager VM: Ubuntu, dual-homed -- one NIC on VMnet8 (NAT, for its own internet access/updates), a second NIC added specifically on VMnet4 so the manager is directly reachable from Victim-Win10 without routing through OPNsense (no security reason for the monitoring platform itself to sit behind the firewall being tested).
 - Second NIC static IP, set via netplan (`/etc/netplan/00-installer-config.yaml`):
   ```yaml
   network:
